@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <vector>
 
+#include "Player.h"
+#include "TetrisBoard.h"
+
 const int ROWS = 20;
 const int COLUMNS = 10;
 
@@ -11,42 +14,253 @@ struct GameData
 {
 };
 
-struct Shape
+struct Cell
 {
-	int width = 0;
-	int height = 0;
-	std::vector<std::vector<int>> points;
 	int x = 0;
 	int y = 0;
+};
+
+struct Shape
+{
+	std::vector<Cell> cells;
+	int size = 0;
+	Vec2i shapeOffset;
 
 	Shape() {}
 
-	Shape(const std::vector<std::vector<int>> &pts) : points(pts)
+	Shape(const std::vector<Cell> &cls) : cells(cls)
 	{
-		width = points.size();
-		height = points[0].size();
+		int width = cells[0].x;
+		int height = cells[0].y;
+		shapeOffset.x = cells[0].x;
+		shapeOffset.y = cells[0].y;
+
+		for (Cell &cell : cells)
+		{
+			shapeOffset.x = std::min(cell.x, shapeOffset.x);
+			shapeOffset.y = std::min(cell.y, shapeOffset.y);
+			width = std::max(cell.x, width);
+			height = std::max(cell.y, height);
+		}
+
+		size = std::max(width, height);
+	}
+
+	void moveLeft(int moveCount = 1)
+	{
+		for (Cell &cell : cells)
+		{
+			cell.x -= moveCount;
+		}
+	}
+
+	void moveRight(int moveCount = 1)
+	{
+		for (Cell &cell : cells)
+		{
+			cell.x += moveCount;
+		}
+	}
+
+	void moveDown()
+	{
+		for (Cell &cell : cells)
+		{
+			cell.y += 1;
+		}
+	}
+
+	void moveUp()
+	{
+		for (Cell &cell : cells)
+		{
+			cell.y -= 1;
+		}
 	}
 
 	void rotate()
 	{
-		std::vector<std::vector<int>> newPoints;
-
-		for (int y = height - 1; y >= 0; y--)
+		if (cells.empty())
 		{
-			std::vector<int> columnValues;
-			for (int x = 0; x < width; x++)
-			{
-				columnValues.push_back(points[x][y]);
-			}
-			newPoints.push_back(columnValues);
+			return;
 		}
-		y = y + (height - width);
-		int tempHeight = height;
-		height = width;
-		width = tempHeight;
-		points = newPoints;
+		int leftMostX = cells[0].x;
+		// int rightMostX = cells[0].x;
+		int topMostY = cells[0].y;
+		// int bottomMostY = cells[0].y;
+		for (Cell &cell : cells)
+		{
+			leftMostX = std::min(cell.x, leftMostX);
+			// 	rightMostX = std::max(cell.x, rightMostX);
+			topMostY = std::min(cell.y, topMostY);
+			// 	bottomMostY = std::max(cell.y, bottomMostY);
+		}
+		// int width = rightMostX - leftMostX;
+		// int height = bottomMostY - topMostY;
+		// int heightAdjust = height - width;
+
+		int nextOffsetX = 0;
+		int nextOffsetY = 0;
+		for (Cell &cell : cells)
+		{
+			// move shape to 0,0
+			cell.x += -leftMostX - size / 2 + shapeOffset.x;
+			cell.y += -topMostY - size / 2 + shapeOffset.y;
+
+			int newX = -cell.y;
+			int newY = cell.x;
+			// rotate
+			cell.x = newX;
+			cell.y = newY;
+			// move to origin place and adjust position to keep shape at same height
+			cell.x += leftMostX + size / 2 - shapeOffset.x;
+			cell.y += topMostY + size / 2 - shapeOffset.y;
+		}
+		int tempX = shapeOffset.x;
+		shapeOffset.x = shapeOffset.y;
+		shapeOffset.y = tempX;
 	}
 };
+
+ShapeModel creteJShapeModel()
+{
+
+	std::vector<Vec2i> shapeCells;
+	shapeCells.push_back({0, 0});
+	shapeCells.push_back({0, 1});
+	shapeCells.push_back({1, 1});
+	shapeCells.push_back({2, 1});
+
+	return ShapeModel(shapeCells);
+}
+
+ShapeModel creteLShapeModel()
+{
+
+	std::vector<Vec2i> shapeCells;
+	shapeCells.push_back({0, 1});
+	shapeCells.push_back({1, 1});
+	shapeCells.push_back({2, 1});
+	shapeCells.push_back({2, 0});
+
+	return ShapeModel(shapeCells);
+}
+
+ShapeModel creteIShapeModel()
+{
+
+	std::vector<Vec2i> shapeCells;
+	shapeCells.push_back({1, 0});
+	shapeCells.push_back({1, 1});
+	shapeCells.push_back({1, 2});
+	shapeCells.push_back({1, 3});
+
+	return ShapeModel(shapeCells);
+}
+
+ShapeModel creteOShapeModel()
+{
+
+	std::vector<Vec2i> shapeCells;
+	shapeCells.push_back({0, 0});
+	shapeCells.push_back({1, 0});
+	shapeCells.push_back({0, 1});
+	shapeCells.push_back({1, 1});
+
+	return ShapeModel(shapeCells);
+}
+
+ShapeModel creteSShapeModel()
+{
+
+	std::vector<Vec2i> shapeCells;
+	shapeCells.push_back({0, 1});
+	shapeCells.push_back({1, 1});
+	shapeCells.push_back({1, 0});
+	shapeCells.push_back({2, 0});
+
+	return ShapeModel(shapeCells);
+}
+
+ShapeModel creteTShapeModel()
+{
+
+	std::vector<Vec2i> shapeCells;
+	shapeCells.push_back({0, 1});
+	shapeCells.push_back({1, 1});
+	shapeCells.push_back({1, 0});
+	shapeCells.push_back({2, 1});
+
+	return ShapeModel(shapeCells);
+}
+
+ShapeModel creteZShapeModel()
+{
+
+	std::vector<Vec2i> shapeCells;
+	shapeCells.push_back({0, 0});
+	shapeCells.push_back({1, 0});
+	shapeCells.push_back({1, 1});
+	shapeCells.push_back({2, 1});
+
+	return ShapeModel(shapeCells);
+}
+
+void drawTetrisBoardBackground(TetrisBoard &tetrisBoard)
+{
+	Vector2 position = tetrisBoard.getPosition();
+	int width = tetrisBoard.getWidth();
+	int height = tetrisBoard.getHeight();
+	int borderWidth = 6;
+	DrawRectangle(position.x - borderWidth, position.y - borderWidth, width + 2 * borderWidth, height + 2 * borderWidth, DARKGRAY);
+	DrawRectangle(position.x, position.y, width, height, LIGHTGRAY);
+}
+
+void drawTetrisCells(TetrisBoard &tetrisBoard, Player &player)
+{
+	Vector2 tetrisPosition = tetrisBoard.getPosition();
+	int tetrisCellSize = tetrisBoard.getCellSize();
+	std::vector<BoardCell> tetrisCells = tetrisBoard.getOccupiedCells();
+
+	for (BoardCell &cell : tetrisCells)
+	{
+		DrawRectangle(tetrisPosition.x + cell.x * tetrisCellSize, tetrisPosition.y + cell.y * tetrisCellSize, tetrisCellSize, tetrisCellSize, GREEN);
+	}
+
+	std::vector<BoardCell> playerCells = player.getCells();
+	ShapeModel model = player.getModel();
+	Vec2i position = player.getPosition();
+
+	DrawRectangle(tetrisPosition.x + position.x * tetrisCellSize, tetrisPosition.y + position.y * tetrisCellSize, tetrisCellSize * model.getSize(), tetrisCellSize * model.getSize(), PURPLE);
+	for (BoardCell &cell : playerCells)
+	{
+		DrawRectangle(tetrisPosition.x + cell.x * tetrisCellSize, tetrisPosition.y + cell.y * tetrisCellSize, tetrisCellSize, tetrisCellSize, GREEN);
+	}
+}
+
+void drawTetrisBoardGrid(TetrisBoard &tetrisBoard)
+{
+	Vector2 position = tetrisBoard.getPosition();
+	int cellSize = tetrisBoard.getCellSize();
+	int width = tetrisBoard.getWidth();
+	int height = tetrisBoard.getHeight();
+	int borderWidth = 5;
+
+	for (int row = 1; row < ROWS; row++)
+	{
+		DrawLineV(
+				{position.x, position.y + cellSize * row},
+				{position.x + width, position.y + cellSize * row},
+				DARKGRAY);
+	}
+	for (int column = 1; column < COLUMNS; column++)
+	{
+		DrawLineV(
+				{position.x + column * cellSize, position.y},
+				{position.x + column * cellSize, position.y + height},
+				DARKGRAY);
+	}
+}
 
 int main()
 {
@@ -60,17 +274,13 @@ int main()
 
 	bool gameOver = false;
 
-	std::vector<Shape> shapes;
+	TetrisBoard tetrisBoard{screenWidth, screenHeight};
 
-	std::vector<std::vector<int>> lShapePoints;
-	lShapePoints.push_back({0, 0, 0, 1});
-	lShapePoints.push_back({1, 1, 1, 1});
-	shapes.push_back(lShapePoints);
+	Player player;
+	player.attachModel(creteZShapeModel());
 
 	const float moveTimeDuration = 0.6;
 	float timer = moveTimeDuration;
-
-	Shape *latestShape;
 
 	while (!WindowShouldClose() && gameOver == false)
 	{
@@ -80,94 +290,95 @@ int main()
 		screenHeight = GetScreenHeight();
 		screenWidth = GetScreenWidth();
 
-		const int tetrisPadding = screenHeight * 0.025;
-		const float tetrisAspectRatio = 1.0f / 2.0f;
-		const float tetrisLeft = tetrisPadding;
-		const float tetrisTop = tetrisPadding;
-		const float tetrisBottom = screenHeight - tetrisPadding;
-		const float tetrisHeight = tetrisBottom - tetrisTop;
-		const float tetrisWidth = tetrisHeight * tetrisAspectRatio;
-		const float tetrisCellSize = tetrisHeight / ROWS;
-		const float tetrisBorderWidth = tetrisWidth * 0.02;
+		tetrisBoard.calculateSize(screenWidth, screenHeight);
 
-		DrawRectangle(tetrisLeft - tetrisBorderWidth, tetrisTop - tetrisBorderWidth, tetrisWidth + 2 * tetrisBorderWidth, tetrisHeight + 2 * tetrisBorderWidth, DARKGRAY);
-		DrawRectangle(tetrisLeft, tetrisTop, tetrisWidth, tetrisHeight, LIGHTGRAY);
+		drawTetrisBoardBackground(tetrisBoard);
 
-		for (int ty = 0; ty < ROWS; ty++)
+		drawTetrisCells(tetrisBoard, player);
+
+		drawTetrisBoardGrid(tetrisBoard);
+
+		if (IsKeyPressed(KEY_LEFT))
 		{
-			for (int tx = 0; tx < COLUMNS; tx++)
-			{
-				for (auto shape : shapes)
-				{
-					int shapeX = tx - shape.x;
-					int shapeY = ty - shape.y;
-					if (shapeX >= 0 && shapeX < shape.width && shapeY >= 0 && shapeY < shape.height)
-					{
-						int shapeValue = shape.points[shapeX][shapeY];
-						if (shapeValue > 0)
-						{
-							DrawRectangle(tetrisLeft + tx * tetrisCellSize, tetrisTop + ty * tetrisCellSize, tetrisCellSize, tetrisCellSize, GREEN);
-						}
-					}
-				}
-			}
+			player.move({-1, 0});
+
+			// for (Cell &cell : latestShape->cells)
+			// {
+			// 	if (cell.x < 0)
+			// 	{
+			// 		latestShape->moveRight();
+			// 		break;
+			// 	}
+			// }
 		}
 
-		for (int row = 1; row < ROWS; row++)
+		if (IsKeyPressed(KEY_RIGHT))
 		{
-			DrawLineV(
-					{tetrisLeft, tetrisTop + tetrisCellSize * row},
-					{tetrisLeft + tetrisWidth, tetrisTop + tetrisCellSize * row},
-					DARKGRAY);
+			player.move({1, 0});
+
+			// for (Cell &cell : latestShape->cells)
+			// {
+			// 	if (cell.x > COLUMNS - 1)
+			// 	{
+			// 		latestShape->moveLeft();
+			// 		break;
+			// 	}
+			// }
 		}
-		for (int column = 1; column < COLUMNS; column++)
+		if (IsKeyPressed(KEY_UP))
 		{
-			DrawLineV(
-					{tetrisLeft + column * tetrisCellSize, tetrisTop},
-					{tetrisLeft + column * tetrisCellSize, tetrisBottom},
-					DARKGRAY);
+			player.rotate();
+
+			// for (Cell &cell : latestShape->cells)
+			// {
+			// 	if (cell.x > COLUMNS - 1)
+			// 	{
+			// 		latestShape->moveLeft(cell.x - COLUMNS + 1);
+			// 		break;
+			// 	}
+			// }
 		}
 
-		if (!shapes.empty())
+		if (IsKeyPressed(KEY_DOWN))
 		{
-			latestShape = &shapes.back();
+			player.move({0, 1});
 		}
 
-		if (latestShape)
+		timer -= GetFrameTime();
+		if (timer < 0)
 		{
-			if (IsKeyPressed(KEY_LEFT))
-			{
-				latestShape->x = std::max(latestShape->x - 1, 0);
-			}
-			if (IsKeyPressed(KEY_RIGHT))
-			{
-				latestShape->x = std::min(latestShape->x + 1, COLUMNS - latestShape->width);
-			}
-			if (IsKeyPressed(KEY_UP))
-			{
-				latestShape->rotate();
-				if (latestShape->x + latestShape->width > COLUMNS)
-				{
-					latestShape->x = COLUMNS - latestShape->width;
-				}
-			}
-
-			timer -= GetFrameTime();
-			if (timer < 0)
-			{
-				timer += moveTimeDuration;
-				latestShape->y += 1;
-				if (latestShape->y + latestShape->height > ROWS)
-				{
-					latestShape->y = ROWS - latestShape->height;
-
-					std::vector<std::vector<int>> lShapePoints;
-					lShapePoints.push_back({0, 0, 0, 1});
-					lShapePoints.push_back({1, 1, 1, 1});
-					shapes.push_back(lShapePoints);
-				}
-			}
+			timer += moveTimeDuration;
 		}
+
+		// bool hit = false;
+		// for (Cell &cell : latestShape->cells)
+		// {
+		// 	if (cell.y > ROWS - 1)
+		// 	{
+		// 		latestShape->moveUp();
+		// 		hit = true;
+		// 		break;
+		// 	}
+		// 	int shapesCount = shapes.size();
+		// 	for (int i = 0; i < shapesCount - 1; i++)
+		// 	{
+		// 		for (Cell &otherCell : shapes[i].cells)
+		// 		{
+		// 			// TODO: check and adjust for horizontal collision
+		// 			if (cell.y == otherCell.y & cell.x == otherCell.x)
+		// 			{
+		// 				latestShape->moveUp();
+		// 				hit = true;
+		// 			}
+		// 		}
+		// 	}
+		// }
+
+		// if (hit)
+		// {
+		// 	// TODO: check current shape is above top
+		// 	shapes.push_back(createLShape());
+		// }
 
 		EndDrawing();
 	}
