@@ -6,6 +6,10 @@
 #include "Player.h"
 #include "TetrisBoard.h"
 
+#include "imgui.h"
+#include "imguiThemes.h"
+#include "rlImGui.h"
+
 const int ROWS = 20;
 const int COLUMNS = 10;
 
@@ -13,198 +17,6 @@ const int COLUMNS = 10;
 struct GameData
 {
 };
-
-struct Cell
-{
-	int x = 0;
-	int y = 0;
-};
-
-struct Shape
-{
-	std::vector<Cell> cells;
-	int size = 0;
-	Vec2i shapeOffset;
-
-	Shape() {}
-
-	Shape(const std::vector<Cell> &cls) : cells(cls)
-	{
-		int width = cells[0].x;
-		int height = cells[0].y;
-		shapeOffset.x = cells[0].x;
-		shapeOffset.y = cells[0].y;
-
-		for (Cell &cell : cells)
-		{
-			shapeOffset.x = std::min(cell.x, shapeOffset.x);
-			shapeOffset.y = std::min(cell.y, shapeOffset.y);
-			width = std::max(cell.x, width);
-			height = std::max(cell.y, height);
-		}
-
-		size = std::max(width, height);
-	}
-
-	void moveLeft(int moveCount = 1)
-	{
-		for (Cell &cell : cells)
-		{
-			cell.x -= moveCount;
-		}
-	}
-
-	void moveRight(int moveCount = 1)
-	{
-		for (Cell &cell : cells)
-		{
-			cell.x += moveCount;
-		}
-	}
-
-	void moveDown()
-	{
-		for (Cell &cell : cells)
-		{
-			cell.y += 1;
-		}
-	}
-
-	void moveUp()
-	{
-		for (Cell &cell : cells)
-		{
-			cell.y -= 1;
-		}
-	}
-
-	void rotate()
-	{
-		if (cells.empty())
-		{
-			return;
-		}
-		int leftMostX = cells[0].x;
-		// int rightMostX = cells[0].x;
-		int topMostY = cells[0].y;
-		// int bottomMostY = cells[0].y;
-		for (Cell &cell : cells)
-		{
-			leftMostX = std::min(cell.x, leftMostX);
-			// 	rightMostX = std::max(cell.x, rightMostX);
-			topMostY = std::min(cell.y, topMostY);
-			// 	bottomMostY = std::max(cell.y, bottomMostY);
-		}
-		// int width = rightMostX - leftMostX;
-		// int height = bottomMostY - topMostY;
-		// int heightAdjust = height - width;
-
-		int nextOffsetX = 0;
-		int nextOffsetY = 0;
-		for (Cell &cell : cells)
-		{
-			// move shape to 0,0
-			cell.x += -leftMostX - size / 2 + shapeOffset.x;
-			cell.y += -topMostY - size / 2 + shapeOffset.y;
-
-			int newX = -cell.y;
-			int newY = cell.x;
-			// rotate
-			cell.x = newX;
-			cell.y = newY;
-			// move to origin place and adjust position to keep shape at same height
-			cell.x += leftMostX + size / 2 - shapeOffset.x;
-			cell.y += topMostY + size / 2 - shapeOffset.y;
-		}
-		int tempX = shapeOffset.x;
-		shapeOffset.x = shapeOffset.y;
-		shapeOffset.y = tempX;
-	}
-};
-
-ShapeModel creteJShapeModel()
-{
-
-	std::vector<Vec2i> shapeCells;
-	shapeCells.push_back({0, 0});
-	shapeCells.push_back({0, 1});
-	shapeCells.push_back({1, 1});
-	shapeCells.push_back({2, 1});
-
-	return ShapeModel(shapeCells);
-}
-
-ShapeModel creteLShapeModel()
-{
-
-	std::vector<Vec2i> shapeCells;
-	shapeCells.push_back({0, 1});
-	shapeCells.push_back({1, 1});
-	shapeCells.push_back({2, 1});
-	shapeCells.push_back({2, 0});
-
-	return ShapeModel(shapeCells);
-}
-
-ShapeModel creteIShapeModel()
-{
-
-	std::vector<Vec2i> shapeCells;
-	shapeCells.push_back({1, 0});
-	shapeCells.push_back({1, 1});
-	shapeCells.push_back({1, 2});
-	shapeCells.push_back({1, 3});
-
-	return ShapeModel(shapeCells);
-}
-
-ShapeModel creteOShapeModel()
-{
-
-	std::vector<Vec2i> shapeCells;
-	shapeCells.push_back({0, 0});
-	shapeCells.push_back({1, 0});
-	shapeCells.push_back({0, 1});
-	shapeCells.push_back({1, 1});
-
-	return ShapeModel(shapeCells);
-}
-
-ShapeModel creteSShapeModel()
-{
-
-	std::vector<Vec2i> shapeCells;
-	shapeCells.push_back({0, 1});
-	shapeCells.push_back({1, 1});
-	shapeCells.push_back({1, 0});
-	shapeCells.push_back({2, 0});
-
-	return ShapeModel(shapeCells);
-}
-
-ShapeModel creteTShapeModel()
-{
-
-	std::vector<Vec2i> shapeCells;
-	shapeCells.push_back({0, 1});
-	shapeCells.push_back({1, 1});
-	shapeCells.push_back({1, 0});
-	shapeCells.push_back({2, 1});
-
-	return ShapeModel(shapeCells);
-}
-
-ShapeModel creteZShapeModel()
-{
-
-	std::vector<Vec2i> shapeCells;
-	shapeCells.push_back({0, 0});
-	shapeCells.push_back({1, 0});
-	shapeCells.push_back({1, 1});
-	shapeCells.push_back({2, 1});
-
-	return ShapeModel(shapeCells);
-}
 
 void drawTetrisBoardBackground(TetrisBoard &tetrisBoard)
 {
@@ -216,7 +28,7 @@ void drawTetrisBoardBackground(TetrisBoard &tetrisBoard)
 	DrawRectangle(position.x, position.y, width, height, LIGHTGRAY);
 }
 
-void drawTetrisCells(TetrisBoard &tetrisBoard, Player &player)
+void drawTetrisCells(TetrisBoard &tetrisBoard, Player &player, bool showShapeRect)
 {
 	Vector2 tetrisPosition = tetrisBoard.getPosition();
 	int tetrisCellSize = tetrisBoard.getCellSize();
@@ -228,10 +40,13 @@ void drawTetrisCells(TetrisBoard &tetrisBoard, Player &player)
 	}
 
 	std::vector<BoardCell> playerCells = player.getCells();
-	ShapeModel model = player.getModel();
+	const ShapeModel *model = player.getModel();
 	Vec2i position = player.getPosition();
 
-	DrawRectangle(tetrisPosition.x + position.x * tetrisCellSize, tetrisPosition.y + position.y * tetrisCellSize, tetrisCellSize * model.getSize(), tetrisCellSize * model.getSize(), PURPLE);
+	if (showShapeRect)
+	{
+		DrawRectangle(tetrisPosition.x + position.x * tetrisCellSize, tetrisPosition.y + position.y * tetrisCellSize, tetrisCellSize * model->getSize(), tetrisCellSize * model->getSize(), PURPLE);
+	}
 	for (BoardCell &cell : playerCells)
 	{
 		DrawRectangle(tetrisPosition.x + cell.x * tetrisCellSize, tetrisPosition.y + cell.y * tetrisCellSize, tetrisCellSize, tetrisCellSize, GREEN);
@@ -265,19 +80,40 @@ void drawTetrisBoardGrid(TetrisBoard &tetrisBoard)
 int main()
 {
 
-	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+	SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
 	int screenWidth = 800;
 	int screenHeight = 450;
 
 	InitWindow(screenWidth, screenHeight, "Tetris");
 	SetWindowMinSize(400, 200);
 
+#pragma region imgui
+	rlImGuiSetup(true);
+
+	// you can use whatever imgui theme you like!
+	imguiThemes::green();
+
+	ImGuiIO &io = ImGui::GetIO();
+	(void)io;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;			// Enable Docking
+	io.FontGlobalScale = 1;
+
+	ImGuiStyle &style = ImGui::GetStyle();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		style.Colors[ImGuiCol_WindowBg].w = 0.5f;
+	}
+
+#pragma endregion
+
 	bool gameOver = false;
+	bool showShapeRect = false;
 
 	TetrisBoard tetrisBoard{screenWidth, screenHeight};
 
 	Player player;
-	player.attachModel(creteZShapeModel());
+	player.attachModel(&ShapeModels::JShape);
 
 	const float moveTimeDuration = 0.6;
 	float timer = moveTimeDuration;
@@ -294,7 +130,7 @@ int main()
 
 		drawTetrisBoardBackground(tetrisBoard);
 
-		drawTetrisCells(tetrisBoard, player);
+		drawTetrisCells(tetrisBoard, player, showShapeRect);
 
 		drawTetrisBoardGrid(tetrisBoard);
 
@@ -379,6 +215,30 @@ int main()
 		// 	// TODO: check current shape is above top
 		// 	shapes.push_back(createLShape());
 		// }
+#pragma region imgui
+		rlImGuiBegin();
+
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, {});
+		ImGui::PushStyleColor(ImGuiCol_DockingEmptyBg, {});
+		ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+		ImGui::PopStyleColor(2);
+#pragma endregion
+
+		ImGui::Begin("Dev");
+
+		ImGui::Checkbox("Show shape rect", &showShapeRect);
+
+		ImGui::End();
+
+#pragma region imgui
+		rlImGuiEnd();
+
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+		}
+#pragma endregion
 
 		EndDrawing();
 	}

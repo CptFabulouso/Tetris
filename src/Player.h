@@ -30,24 +30,25 @@ namespace Rotations
 class Player
 {
 private:
-  ShapeModel m_shapeModel;
-  Vec2i m_shapePosition;
+  const ShapeModel *m_shapeModel;
   std::vector<BoardCell> m_shapeCells;
+  Vec2i m_shapePosition;
   Rotation m_rotation = DEG0;
 
 public:
   Player() {}
 
-  void attachModel(const ShapeModel &model);
+  void attachModel(const ShapeModel *model);
 
   void move(Vec2i direction);
 
   void rotate();
 
   const std::vector<BoardCell> &getCells();
-  const ShapeModel &getModel() const;
+  const ShapeModel *getModel() const;
   const Vec2i &getPosition() const;
 
 private:
+  void calculateShapeCellsPosition();
   const Mat2 getRotationMatrix() const;
 };
