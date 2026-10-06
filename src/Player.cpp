@@ -1,81 +1,23 @@
 #include "Player.h"
+#include "raylib.h"
 
-void Player::attachModel(const ShapeModel *model)
+Action Player::getAction()
 {
-  m_shapeModel = model;
-  m_shapePosition.y = 0;
-  m_shapeCells.resize(model->getCells().size());
-  calculateShapeCellsPosition();
-}
-
-void Player::move(Vec2i direction)
-{
-  m_shapePosition.x += direction.x;
-  m_shapePosition.y += direction.y;
-  calculateShapeCellsPosition();
-}
-
-void Player::rotate()
-{
-  m_rotation = static_cast<Rotation>((static_cast<int>(m_rotation) + 1) % static_cast<int>(Rotation::DEG270 + 1));
-  calculateShapeCellsPosition();
-}
-
-const std::vector<BoardCell> &Player::getCells()
-{
-  return m_shapeCells;
-}
-
-const ShapeModel *Player::getModel() const
-{
-  return m_shapeModel;
-}
-
-const Vec2i &Player::getPosition() const
-{
-  return m_shapePosition;
-}
-
-void Player::calculateShapeCellsPosition()
-{
-  if (!m_shapeModel)
+  if (IsKeyPressed(KEY_LEFT))
   {
-    return;
+    return Action::MOVE_LEFT;
   }
-  std::vector<Vec2i> modelCells = m_shapeModel->getCells();
-
-  Mat3 rotationMatrix = m_shapeModel->getRotationMatrix(m_rotation);
-
-  for (int i = 0; i < modelCells.size(); i++)
+  else if (IsKeyPressed(KEY_RIGHT))
   {
-    Vec2i cell = modelCells[i];
-    int x = rotationMatrix.m[0][0] * cell.x + rotationMatrix.m[0][1] * cell.y + rotationMatrix.m[0][2];
-    int y = rotationMatrix.m[1][0] * cell.x + rotationMatrix.m[1][1] * cell.y + rotationMatrix.m[1][2];
-
-    x += m_shapePosition.x + m_shapeModel->getSize() / 2;
-    y += m_shapePosition.y + m_shapeModel->getSize() / 2;
-
-    if (i < m_shapeCells.size())
-    {
-      m_shapeCells[i].x = x;
-      m_shapeCells[i].y = y;
-    }
+    return Action::MOVE_RIGHT;
   }
-}
-
-const Mat2 Player::getRotationMatrix() const
-{
-  if (m_rotation == DEG0)
+  else if (IsKeyPressed(KEY_UP))
   {
-    return Rotations::deg0;
+    return Action::ROTATE;
   }
-  if (m_rotation == DEG90)
+  else if (IsKeyPressed(KEY_DOWN))
   {
-    return Rotations::deg90;
+    // TODO:
   }
-  if (m_rotation == DEG180)
-  {
-    return Rotations::deg180;
-  }
-  return Rotations::deg270;
+  return Action::NONE;
 }

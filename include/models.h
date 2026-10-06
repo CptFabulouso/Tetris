@@ -29,3 +29,11 @@ enum Rotation
   DEG180,
   DEG270,
 };
+
+enum Action
+{
+  NONE,
+  MOVE_LEFT,
+  MOVE_RIGHT,
+  ROTATE
+};

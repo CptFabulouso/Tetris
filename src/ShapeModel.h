@@ -63,14 +63,3 @@ public:
     return Mat3{{{0, 1, 0}, {-1, 0, move}, {0, 0, 0}}};
   }
 };
-
-namespace ShapeModels
-{
-  const ShapeModel JShape({{0, 0}, {0, 1}, {1, 1}, {2, 1}});
-  const ShapeModel LShape({{0, 1}, {1, 1}, {2, 1}, {2, 0}});
-  const ShapeModel IShape({{1, 0}, {1, 1}, {1, 2}, {1, 3}});
-  const ShapeModel OShape({{0, 0}, {1, 0}, {0, 1}, {1, 1}});
-  const ShapeModel SShape({{0, 1}, {1, 1}, {1, 0}, {2, 0}});
-  const ShapeModel TShape({{0, 1}, {1, 1}, {1, 0}, {2, 1}});
-  const ShapeModel ZShape({{0, 0}, {1, 0}, {1, 1}, {2, 1}});
-}
