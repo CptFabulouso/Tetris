@@ -30,7 +30,7 @@ bool TetrisBoard::canPlace(Tetromino tetromino)
 
   for (BoardCell &tetrominoCell : tetrominoCells)
   {
-    if (tetrominoCell.x < 0 || tetrominoCell.x > COLUMNS - 1)
+    if (tetrominoCell.x < 0 || tetrominoCell.x > COLUMNS - 1 || tetrominoCell.y > ROWS - 1)
     {
       return false;
     }

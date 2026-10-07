@@ -35,5 +35,7 @@ enum Action
   NONE,
   MOVE_LEFT,
   MOVE_RIGHT,
+  MOVE_DOWN,
+  INSTANT_DOWN,
   ROTATE
 };

@@ -27,7 +27,7 @@ int main()
 	SetWindowMinSize(400, 200);
 
 	Renderer renderer;
-	TetrisGame tetrisGame;
+	TetrisGame tetrisGame{&TetrominoModels::IShape};
 	Player player;
 
 	while (!WindowShouldClose() && tetrisGame.getIsGameOver() == false)
@@ -35,9 +35,10 @@ int main()
 		BeginDrawing();
 		ClearBackground(SKYBLUE);
 
-		Action action = player.getAction();
+		float dt = GetFrameTime();
+		Action action = player.getAction(dt);
 		tetrisGame.applyAction(action);
-		tetrisGame.update(GetFrameTime());
+		tetrisGame.update(dt);
 
 		renderer.render(tetrisGame);
 		renderer.renderImGUI();

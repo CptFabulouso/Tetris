@@ -19,4 +19,5 @@ private:
   void drawTetrisBoardGrid(const TetrisGame &game);
   void drawTetrisOccupiedCells(const TetrisGame &game);
   void drawTetrisActiveTetromino(const TetrisGame &game);
+  void drawTetrisShadowTetromino(const TetrisGame &game);
 };
