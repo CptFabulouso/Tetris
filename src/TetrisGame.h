@@ -4,6 +4,12 @@
 #include "Tetromino.h"
 #include "models.h"
 
+struct ModelAndColor
+{
+  const ShapeModel *model;
+  Color color;
+};
+
 class TetrisGame
 {
 private:
@@ -15,6 +21,7 @@ private:
   bool m_gameOver = false;
 
 public:
+  TetrisGame();
   TetrisGame(const ShapeModel *model);
 
   void update(float dt);
@@ -45,5 +52,6 @@ private:
   void tryRotate(int direction);
   void calculateShadowTetromino();
   void placeTetromino(Tetromino &tetromino);
-  const ShapeModel *getRandomTetrominoShape();
+  void spawnTetromino();
+  const ModelAndColor getRandomTetrominoShape();
 };

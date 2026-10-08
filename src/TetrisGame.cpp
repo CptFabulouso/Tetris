@@ -3,6 +3,13 @@
 
 TetrisGame::TetrisGame(const ShapeModel *initialShape) : m_board{0, 0}, m_activeTetromino(initialShape), m_shadowTetromino(initialShape)
 {
+  m_activeTetromino.setColor(GREEN);
+  m_shadowTetromino.setColor(GREEN);
+}
+
+TetrisGame::TetrisGame() : m_board{0, 0}, m_activeTetromino(&TetrominoModels::JShape), m_shadowTetromino(&TetrominoModels::JShape)
+{
+  spawnTetromino();
 }
 
 void TetrisGame::update(float dt)
@@ -73,6 +80,14 @@ void TetrisGame::tryRotate(int direction)
 {
   Tetromino canditate = m_activeTetromino;
   canditate.rotate(direction);
+
+  if (m_board.canPlace(canditate))
+  {
+    m_activeTetromino.setRotation(canditate.getRotation());
+    m_activeTetromino.setPosition(canditate.getPosition());
+    return;
+  }
+
   /* try wall kick to the right */
   for (int kick = 0; kick <= 2; kick++)
   {
@@ -116,33 +131,39 @@ void TetrisGame::calculateShadowTetromino()
 void TetrisGame::placeTetromino(Tetromino &tetromino)
 {
   m_board.addOccupiedCells(tetromino.getCells());
+  spawnTetromino();
 
-  const ShapeModel *nextTetrominoModel = getRandomTetrominoShape();
-  m_activeTetromino = Tetromino(nextTetrominoModel);
-  m_shadowTetromino = Tetromino(nextTetrominoModel);
+  int collapsedRows = m_board.collapseFullRows();
 }
 
-const ShapeModel *TetrisGame::getRandomTetrominoShape()
+void TetrisGame::spawnTetromino()
+{
+  const ModelAndColor nextTetrominoModel = getRandomTetrominoShape();
+
+  m_activeTetromino = Tetromino(nextTetrominoModel.model, nextTetrominoModel.color);
+  m_shadowTetromino = Tetromino(nextTetrominoModel.model, nextTetrominoModel.color);
+}
+
+const ModelAndColor TetrisGame::getRandomTetrominoShape()
 {
   int random = rand() % 8;
   switch (random)
   {
   case 1:
-    return &TetrominoModels::JShape;
+    return {&TetrominoModels::JShape, GREEN};
   case 2:
-    return &TetrominoModels::LShape;
+    return {&TetrominoModels::LShape, BLUE};
   case 3:
-    return &TetrominoModels::IShape;
+    return {&TetrominoModels::IShape, PURPLE};
   case 4:
-    return &TetrominoModels::OShape;
+    return {&TetrominoModels::OShape, LIME};
   case 5:
-    return &TetrominoModels::SShape;
+    return {&TetrominoModels::SShape, MAROON};
   case 6:
-    return &TetrominoModels::TShape;
+    return {&TetrominoModels::TShape, RED};
   case 7:
-    return &TetrominoModels::ZShape;
   default:
-    return &TetrominoModels::ZShape;
+    return {&TetrominoModels::ZShape, YELLOW};
     break;
   }
 }

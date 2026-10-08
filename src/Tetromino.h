@@ -1,8 +1,16 @@
 #pragma once
 
+#include "raylib.h"
 #include <vector>
 #include "models.h"
 #include "ShapeModel.h"
+
+struct BoardCell
+{
+  Color color = {0, 0, 0, 255};
+  int x = 0;
+  int y = 0;
+};
 
 namespace Rotations
 {
@@ -36,6 +44,7 @@ private:
 
 public:
   Tetromino(const ShapeModel *model);
+  Tetromino(const ShapeModel *model, Color color);
 
   const std::vector<BoardCell> &getCells();
   const ShapeModel *getModel() const;
@@ -45,6 +54,7 @@ public:
   void rotate(int direction);
   void setPosition(Vec2i position);
   void setRotation(Rotation rotation);
+  void setColor(Color color);
 
 private:
   void calculateShapeCellsPosition();

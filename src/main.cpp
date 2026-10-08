@@ -27,7 +27,7 @@ int main()
 	SetWindowMinSize(400, 200);
 
 	Renderer renderer;
-	TetrisGame tetrisGame{&TetrominoModels::IShape};
+	TetrisGame tetrisGame{};
 	Player player;
 
 	while (!WindowShouldClose() && tetrisGame.getIsGameOver() == false)

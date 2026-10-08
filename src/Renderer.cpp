@@ -104,11 +104,17 @@ void Renderer::drawTetrisOccupiedCells(const TetrisGame &game)
 
   Vector2 tetrisPosition = tetrisBoard.getPosition();
   int tetrisCellSize = tetrisBoard.getCellSize();
-  std::vector<BoardCell> tetrisCells = tetrisBoard.getOccupiedCells();
+  TetrisBoard::TetrisBoardGrid tetrisGrid = tetrisBoard.getGrid();
 
-  for (BoardCell &cell : tetrisCells)
+  for (size_t x = 0; x < tetrisGrid.size(); x++)
   {
-    DrawRectangle(tetrisPosition.x + cell.x * tetrisCellSize, tetrisPosition.y + cell.y * tetrisCellSize, tetrisCellSize, tetrisCellSize, GREEN);
+    for (size_t y = 0; y < tetrisGrid[x].size(); y++)
+    {
+      if (tetrisGrid[x][y].has_value())
+      {
+        DrawRectangle(tetrisPosition.x + x * tetrisCellSize, tetrisPosition.y + y * tetrisCellSize, tetrisCellSize, tetrisCellSize, tetrisGrid[x][y]->color);
+      };
+    }
   }
 }
 
@@ -130,7 +136,7 @@ void Renderer::drawTetrisActiveTetromino(const TetrisGame &game)
   }
   for (BoardCell &cell : activeTetrominoCells)
   {
-    DrawRectangle(tetrisPosition.x + cell.x * tetrisCellSize, tetrisPosition.y + cell.y * tetrisCellSize, tetrisCellSize, tetrisCellSize, GREEN);
+    DrawRectangle(tetrisPosition.x + cell.x * tetrisCellSize, tetrisPosition.y + cell.y * tetrisCellSize, tetrisCellSize, tetrisCellSize, cell.color);
   }
 }
 

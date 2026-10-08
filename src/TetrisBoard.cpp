@@ -21,7 +21,10 @@ void TetrisBoard::calculateSize(int screenWidth, int screenHeight)
 
 void TetrisBoard::addOccupiedCells(std::vector<BoardCell> cells)
 {
-  m_occupiedCells.insert(m_occupiedCells.end(), cells.begin(), cells.end());
+  for (BoardCell cell : cells)
+  {
+    m_grid[cell.x][cell.y] = cell;
+  }
 }
 
 bool TetrisBoard::canPlace(Tetromino tetromino)
@@ -35,13 +38,52 @@ bool TetrisBoard::canPlace(Tetromino tetromino)
       return false;
     }
 
-    for (BoardCell &occupiedCell : m_occupiedCells)
+    if (m_grid[tetrominoCell.x][tetrominoCell.y].has_value())
     {
-      if (tetrominoCell.y == occupiedCell.y & tetrominoCell.x == occupiedCell.x)
-      {
-        return false;
-      }
+      return false;
     }
   }
   return true;
+}
+
+int TetrisBoard::collapseFullRows()
+{
+  int moveRowBy = 0;
+
+  /* Check rows from bottom up. Once we find full row(s),
+    we move all subsequent rows down by that amount
+   */
+  for (int y = ROWS - 1; y >= 0; y--)
+  {
+    bool rowFilled = true;
+    bool rowHasFilledCell = false;
+    for (int x = 0; x < COLUMNS; x++)
+    {
+      if (!m_grid[x][y].has_value())
+      {
+        rowFilled = false;
+      }
+      else
+      {
+        rowHasFilledCell = true;
+      }
+      if (moveRowBy != 0)
+      {
+        m_grid[x][y + moveRowBy] = m_grid[x][y];
+        m_grid[x][y] = std::nullopt;
+      }
+    }
+    if (rowFilled)
+    {
+      moveRowBy++;
+    }
+    if (!rowHasFilledCell)
+    {
+      // when there is no filled cell in a row, we can stop checking further
+      // no float rows are allowed
+      break;
+    }
+  }
+
+  return moveRowBy;
 }

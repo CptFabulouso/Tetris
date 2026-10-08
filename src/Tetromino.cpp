@@ -6,6 +6,11 @@ Tetromino::Tetromino(const ShapeModel *model) : m_shapeModel(model)
   calculateShapeCellsPosition();
 }
 
+Tetromino::Tetromino(const ShapeModel *model, Color color) : Tetromino(model)
+{
+  setColor(color);
+}
+
 void Tetromino::calculateShapeCellsPosition()
 {
   if (!m_shapeModel)
@@ -93,4 +98,12 @@ void Tetromino::setRotation(Rotation rotation)
 {
   m_rotation = rotation;
   calculateShapeCellsPosition();
+}
+
+void Tetromino::setColor(Color color)
+{
+  for (BoardCell &cell : m_shapeCells)
+  {
+    cell.color = color;
+  }
 }

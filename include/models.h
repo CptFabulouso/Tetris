@@ -6,12 +6,6 @@ struct Vec2i
   int y = 0;
 };
 
-struct BoardCell
-{
-  int x = 0;
-  int y = 0;
-};
-
 struct Mat2
 {
   float m[2][2];
