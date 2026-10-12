@@ -1,13 +1,17 @@
 #include "TetrisGame.h"
 #include "raylib.h"
 
-TetrisGame::TetrisGame(const ShapeModel *initialShape) : m_board{0, 0}, m_activeTetromino(initialShape), m_shadowTetromino(initialShape)
+TetrisGame::TetrisGame(const ShapeModel *initialShape) : m_board{0, 0}, m_activeTetromino(initialShape), m_shadowTetromino(initialShape), m_nextTetrominos{
+                                                                                                                                              getRandomTetromino(),
+                                                                                                                                              getRandomTetromino(),
+                                                                                                                                              getRandomTetromino(),
+                                                                                                                                          }
 {
   m_activeTetromino.setColor(GREEN);
   m_shadowTetromino.setColor(GREEN);
 }
 
-TetrisGame::TetrisGame() : m_board{0, 0}, m_activeTetromino(&TetrominoModels::JShape), m_shadowTetromino(&TetrominoModels::JShape)
+TetrisGame::TetrisGame() : TetrisGame(&TetrominoModels::JShape)
 {
   spawnTetromino();
 }
@@ -18,6 +22,10 @@ void TetrisGame::update(float dt)
   int screenWidth = GetScreenWidth();
 
   m_board.calculateSize(screenWidth, screenHeight);
+  int boardWidth = m_board.getWidth();
+  Vector2 boardPosition = m_board.getPosition();
+  m_nextTetrominoBoard.setPosition({boardPosition.x + boardWidth + 20, boardPosition.y});
+  m_nextTetrominoBoard.calculateSize(screenWidth, screenHeight);
 
   m_timer -= dt;
   if (m_timer < 0)
@@ -138,13 +146,19 @@ void TetrisGame::placeTetromino(Tetromino &tetromino)
 
 void TetrisGame::spawnTetromino()
 {
-  const ModelAndColor nextTetrominoModel = getRandomTetrominoShape();
+  const Tetromino nextTetromino = m_nextTetrominos[0];
 
-  m_activeTetromino = Tetromino(nextTetrominoModel.model, nextTetrominoModel.color);
-  m_shadowTetromino = Tetromino(nextTetrominoModel.model, nextTetrominoModel.color);
+  m_activeTetromino = nextTetromino;
+  m_shadowTetromino = nextTetromino;
+
+  for (int i = 0; i < m_nextTetrominos.size() - 1; i++)
+  {
+    m_nextTetrominos[i] = m_nextTetrominos[i + 1];
+  }
+  m_nextTetrominos[m_nextTetrominos.size()] = getRandomTetromino();
 }
 
-const ModelAndColor TetrisGame::getRandomTetrominoShape()
+const Tetromino TetrisGame::getRandomTetromino()
 {
   int random = rand() % 8;
   switch (random)

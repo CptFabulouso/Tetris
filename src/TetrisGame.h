@@ -1,19 +1,16 @@
 #pragma once
 
 #include "TetrisBoard.h"
+#include "NextTetrominoBoard.h"
 #include "Tetromino.h"
 #include "models.h"
-
-struct ModelAndColor
-{
-  const ShapeModel *model;
-  Color color;
-};
 
 class TetrisGame
 {
 private:
   TetrisBoard m_board;
+  NextTetrominoBoard m_nextTetrominoBoard;
+  std::array<Tetromino, 3> m_nextTetrominos;
   Tetromino m_activeTetromino;
   Tetromino m_shadowTetromino;
   float m_moveDuration = 0.6f;
@@ -33,13 +30,24 @@ public:
     return m_board;
   }
 
+  const NextTetrominoBoard &getNextTetrominoBoard() const
+  {
+    return m_nextTetrominoBoard;
+  }
+
   const Tetromino &getActiveTetromino() const
   {
     return m_activeTetromino;
   }
+
   const Tetromino &getShadowTetromino() const
   {
     return m_shadowTetromino;
+  }
+
+  const std::array<Tetromino, 3> &getNextTetrominos() const
+  {
+    return m_nextTetrominos;
   }
 
   const bool getIsGameOver() const
@@ -53,5 +61,5 @@ private:
   void calculateShadowTetromino();
   void placeTetromino(Tetromino &tetromino);
   void spawnTetromino();
-  const ModelAndColor getRandomTetrominoShape();
+  const Tetromino getRandomTetromino();
 };

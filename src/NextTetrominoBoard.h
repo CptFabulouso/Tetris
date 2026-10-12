@@ -1,0 +1,32 @@
+#pragma once
+
+#include "raylib.h"
+
+class NextTetrominoBoard
+{
+private:
+  Vector2 m_position = {0, 0};
+  int m_width = 0;
+  int m_height = 0;
+
+public:
+  NextTetrominoBoard();
+
+  void setPosition(const Vector2 &newPosition);
+  void calculateSize(int screenWidth, int screenHeight);
+
+  const Vector2 &getPosition() const
+  {
+    return m_position;
+  }
+
+  inline const int getHeight() const
+  {
+    return m_height;
+  }
+
+  inline const int getWidth() const
+  {
+    return m_width;
+  }
+};

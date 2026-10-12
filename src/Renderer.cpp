@@ -31,6 +31,7 @@ void Renderer::render(const TetrisGame &game)
   drawTetrisShadowTetromino(game);
   drawTetrisActiveTetromino(game);
   drawTetrisBoardGrid(game);
+  drawNextTetrominoBoard(game);
 }
 
 void Renderer::renderImGUI()
@@ -155,5 +156,39 @@ void Renderer::drawTetrisShadowTetromino(const TetrisGame &game)
   for (BoardCell &cell : shadowTetrominoCells)
   {
     DrawRectangle(tetrisPosition.x + cell.x * tetrisCellSize, tetrisPosition.y + cell.y * tetrisCellSize, tetrisCellSize, tetrisCellSize, MAGENTA);
+  }
+}
+
+void Renderer::drawNextTetrominoBoard(const TetrisGame &game)
+{
+  NextTetrominoBoard nextTetrominoBoard = game.getNextTetrominoBoard();
+  Vector2 position = nextTetrominoBoard.getPosition();
+  int width = nextTetrominoBoard.getWidth();
+  int height = nextTetrominoBoard.getHeight();
+  int borderWidth = 6;
+  DrawRectangle(position.x - borderWidth, position.y - borderWidth, width + 2 * borderWidth, height + 2 * borderWidth, DARKGRAY);
+  DrawRectangle(position.x, position.y, width, height, LIGHTGRAY);
+
+  int fontSize = 20;
+  int textWidth = MeasureText("Next", fontSize);
+  float textPadding = (width - textWidth) / 2;
+  DrawText("Next", position.x + textPadding, position.y + 5, fontSize, DARKGRAY);
+
+  std::array<Tetromino, 3> nextTetrominos = game.getNextTetrominos();
+
+  int padding = static_cast<int>(width * 0.05) * 2;
+  int tetrominoWidth = width - padding * 2;
+  int tetrominoY = position.y + 30;
+
+  for (int i = 0; i < nextTetrominos.size(); i++)
+  {
+    std::vector<BoardCell> tetrominoCells = nextTetrominos[i].getCells();
+    int modelSize = nextTetrominos[i].getModel()->getSize();
+    int cellSize = tetrominoWidth / modelSize;
+    for (BoardCell &cell : tetrominoCells)
+    {
+      DrawRectangle(position.x + padding + cell.x * cellSize, tetrominoY + cell.y * cellSize, cellSize, cellSize, cell.color);
+    }
+    tetrominoY += cellSize * modelSize;
   }
 }
