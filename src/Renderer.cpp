@@ -176,19 +176,19 @@ void Renderer::drawNextTetrominoBoard(const TetrisGame &game)
 
   std::array<Tetromino, 3> nextTetrominos = game.getNextTetrominos();
 
-  int padding = static_cast<int>(width * 0.05) * 2;
-  int tetrominoWidth = width - padding * 2;
+  int cellSize = nextTetrominoBoard.getCellSize();
   int tetrominoY = position.y + 30;
 
   for (int i = 0; i < nextTetrominos.size(); i++)
   {
     std::vector<BoardCell> tetrominoCells = nextTetrominos[i].getCells();
     int modelSize = nextTetrominos[i].getModel()->getSize();
-    int cellSize = tetrominoWidth / modelSize;
+    int modelWidth = cellSize * modelSize;
+    float startX = position.x + (width - modelWidth) / 2;
     for (BoardCell &cell : tetrominoCells)
     {
-      DrawRectangle(position.x + padding + cell.x * cellSize, tetrominoY + cell.y * cellSize, cellSize, cellSize, cell.color);
+      DrawRectangle(startX + cell.x * cellSize, tetrominoY + cell.y * cellSize, cellSize, cellSize, cell.color);
     }
-    tetrominoY += cellSize * modelSize;
+    tetrominoY += cellSize * modelSize + 10;
   }
 }

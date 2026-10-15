@@ -1,19 +1,19 @@
 #include "TetrisGame.h"
 #include "raylib.h"
 
-TetrisGame::TetrisGame(const ShapeModel *initialShape) : m_board{0, 0}, m_activeTetromino(initialShape), m_shadowTetromino(initialShape), m_nextTetrominos{
-                                                                                                                                              getRandomTetromino(),
-                                                                                                                                              getRandomTetromino(),
-                                                                                                                                              getRandomTetromino(),
-                                                                                                                                          }
+TetrisGame::TetrisGame(const Tetromino &tetromino) : m_board{0, 0},
+                                                     m_activeTetromino(tetromino),
+                                                     m_shadowTetromino(tetromino),
+                                                     m_nextTetrominos{
+                                                         getRandomTetromino(),
+                                                         getRandomTetromino(),
+                                                         getRandomTetromino(),
+                                                     }
 {
-  m_activeTetromino.setColor(GREEN);
-  m_shadowTetromino.setColor(GREEN);
 }
 
-TetrisGame::TetrisGame() : TetrisGame(&TetrominoModels::JShape)
+TetrisGame::TetrisGame() : TetrisGame(getRandomTetromino())
 {
-  spawnTetromino();
 }
 
 void TetrisGame::update(float dt)
@@ -30,8 +30,8 @@ void TetrisGame::update(float dt)
   m_timer -= dt;
   if (m_timer < 0)
   {
-    m_timer += m_moveDuration;
-    m_activeTetromino.move({0, 1});
+    m_timer = m_moveDuration;
+    // m_activeTetromino.move({0, 1});
     if (!m_board.canPlace(m_activeTetromino))
     {
       m_activeTetromino.move({0, -1});
@@ -146,21 +146,22 @@ void TetrisGame::placeTetromino(Tetromino &tetromino)
 
 void TetrisGame::spawnTetromino()
 {
-  const Tetromino nextTetromino = m_nextTetrominos[0];
+  Tetromino nextTetromino = m_nextTetrominos[0];
 
-  m_activeTetromino = nextTetromino;
-  m_shadowTetromino = nextTetromino;
+  m_activeTetromino = m_nextTetrominos[0];
+  m_shadowTetromino = m_nextTetrominos[0];
 
   for (int i = 0; i < m_nextTetrominos.size() - 1; i++)
   {
     m_nextTetrominos[i] = m_nextTetrominos[i + 1];
   }
-  m_nextTetrominos[m_nextTetrominos.size()] = getRandomTetromino();
+  m_nextTetrominos[m_nextTetrominos.size() - 1] = getRandomTetromino();
 }
 
 const Tetromino TetrisGame::getRandomTetromino()
 {
   int random = rand() % 8;
+
   switch (random)
   {
   case 1:

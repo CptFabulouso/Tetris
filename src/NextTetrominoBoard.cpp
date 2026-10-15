@@ -16,4 +16,8 @@ void NextTetrominoBoard::calculateSize(int screenWidth, int screenHeight)
 
   m_width = availableHeight * 0.2;
   m_height = m_width * 3;
+  int padding = static_cast<int>(m_width * 0.05) * 2;
+  int tetrominoWidth = m_width - padding * 2;
+
+  m_cellSize = tetrominoWidth / 4;
 }

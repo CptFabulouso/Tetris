@@ -19,7 +19,7 @@ private:
 
 public:
   TetrisGame();
-  TetrisGame(const ShapeModel *model);
+  TetrisGame(const Tetromino &model);
 
   void update(float dt);
 

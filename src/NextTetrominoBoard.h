@@ -8,6 +8,7 @@ private:
   Vector2 m_position = {0, 0};
   int m_width = 0;
   int m_height = 0;
+  int m_cellSize = 0;
 
 public:
   NextTetrominoBoard();
@@ -28,5 +29,10 @@ public:
   inline const int getWidth() const
   {
     return m_width;
+  }
+
+  inline const int getCellSize() const
+  {
+    return m_cellSize;
   }
 };

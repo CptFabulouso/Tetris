@@ -26,6 +26,8 @@ int main()
 	InitWindow(screenWidth, screenHeight, "Tetris");
 	SetWindowMinSize(400, 200);
 
+	srand(time(0));
+
 	Renderer renderer;
 	TetrisGame tetrisGame{};
 	Player player;
