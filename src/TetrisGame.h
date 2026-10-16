@@ -19,7 +19,7 @@ private:
 
 public:
   TetrisGame();
-  TetrisGame(const Tetromino &model);
+  explicit TetrisGame(const Tetromino &tetromino);
 
   void update(float dt);
 
@@ -50,7 +50,7 @@ public:
     return m_nextTetrominos;
   }
 
-  const bool getIsGameOver() const
+  bool getIsGameOver() const
   {
     return m_gameOver;
   }
@@ -59,7 +59,7 @@ private:
   bool tryMove(Vec2i direction);
   void tryRotate(int direction);
   void calculateShadowTetromino();
-  void placeTetromino(Tetromino &tetromino);
+  void placeTetromino(const Tetromino &tetromino);
   void spawnTetromino();
-  const Tetromino getRandomTetromino();
+  static Tetromino getRandomTetromino();
 };

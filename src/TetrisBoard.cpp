@@ -19,21 +19,21 @@ void TetrisBoard::calculateSize(int screenWidth, int screenHeight)
   m_position.y = m_position.x;
 }
 
-void TetrisBoard::addOccupiedCells(std::vector<BoardCell> cells)
+void TetrisBoard::addOccupiedCells(const std::vector<BoardCell> &cells)
 {
-  for (BoardCell cell : cells)
+  for (const BoardCell &cell : cells)
   {
     m_grid[cell.x][cell.y] = cell;
   }
 }
 
-bool TetrisBoard::canPlace(Tetromino tetromino)
+bool TetrisBoard::canPlace(const Tetromino &tetromino) const
 {
-  std::vector<BoardCell> tetrominoCells = tetromino.getCells();
+  const std::vector<BoardCell> &tetrominoCells = tetromino.getCells();
 
-  for (BoardCell &tetrominoCell : tetrominoCells)
+  for (const BoardCell &tetrominoCell : tetrominoCells)
   {
-    if (tetrominoCell.x < 0 || tetrominoCell.x > COLUMNS - 1 || tetrominoCell.y > ROWS - 1)
+    if (tetrominoCell.x < 0 || tetrominoCell.x > COLUMNS - 1 || tetrominoCell.y > ROWS - 1 || tetrominoCell.y < 0)
     {
       return false;
     }

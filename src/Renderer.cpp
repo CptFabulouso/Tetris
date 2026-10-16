@@ -10,14 +10,13 @@ Renderer::Renderer()
   // you can use whatever imgui theme you like!
   imguiThemes::green();
 
-  m_ImGUIio = &ImGui::GetIO();
-  // (void)m_ImGUIio;
-  m_ImGUIio->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-  m_ImGUIio->ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
-  m_ImGUIio->FontGlobalScale = 1;
+  ImGuiIO &io = ImGui::GetIO();
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
+  io.FontGlobalScale = 1;
 
   ImGuiStyle &style = ImGui::GetStyle();
-  if (m_ImGUIio->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+  if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
   {
     style.Colors[ImGuiCol_WindowBg].w = 0.5f;
   }
@@ -32,6 +31,11 @@ void Renderer::render(const TetrisGame &game)
   drawTetrisActiveTetromino(game);
   drawTetrisBoardGrid(game);
   drawNextTetrominoBoard(game);
+}
+
+Renderer::~Renderer()
+{
+  rlImGuiShutdown();
 }
 
 void Renderer::renderImGUI()
@@ -49,12 +53,14 @@ void Renderer::renderImGUI()
 
   ImGui::Checkbox("Show shape rect", &m_drawShapeRect);
 
+  float framerate = ImGui::GetIO().Framerate;
+  ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / framerate, framerate);
   ImGui::End();
 
 #pragma region imgui
   rlImGuiEnd();
 
-  if (m_ImGUIio->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+  if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
   {
     ImGui::UpdatePlatformWindows();
     ImGui::RenderPlatformWindowsDefault();
@@ -64,8 +70,8 @@ void Renderer::renderImGUI()
 
 void Renderer::drawTetrisBoardBackground(const TetrisGame &game)
 {
-  TetrisBoard tetrisBoard = game.getBoard();
-  Vector2 position = tetrisBoard.getPosition();
+  const TetrisBoard &tetrisBoard = game.getBoard();
+  const Vector2 &position = tetrisBoard.getPosition();
   int width = tetrisBoard.getWidth();
   int height = tetrisBoard.getHeight();
   int borderWidth = 6;
@@ -75,9 +81,9 @@ void Renderer::drawTetrisBoardBackground(const TetrisGame &game)
 
 void Renderer::drawTetrisBoardGrid(const TetrisGame &game)
 {
-  TetrisBoard tetrisBoard = game.getBoard();
+  const TetrisBoard &tetrisBoard = game.getBoard();
 
-  Vector2 position = tetrisBoard.getPosition();
+  const Vector2 &position = tetrisBoard.getPosition();
   int cellSize = tetrisBoard.getCellSize();
   int width = tetrisBoard.getWidth();
   int height = tetrisBoard.getHeight();
@@ -101,11 +107,11 @@ void Renderer::drawTetrisBoardGrid(const TetrisGame &game)
 
 void Renderer::drawTetrisOccupiedCells(const TetrisGame &game)
 {
-  TetrisBoard tetrisBoard = game.getBoard();
+  const TetrisBoard &tetrisBoard = game.getBoard();
 
-  Vector2 tetrisPosition = tetrisBoard.getPosition();
+  const Vector2 &tetrisPosition = tetrisBoard.getPosition();
   int tetrisCellSize = tetrisBoard.getCellSize();
-  TetrisBoard::TetrisBoardGrid tetrisGrid = tetrisBoard.getGrid();
+  const TetrisBoard::TetrisBoardGrid &tetrisGrid = tetrisBoard.getGrid();
 
   for (size_t x = 0; x < tetrisGrid.size(); x++)
   {
@@ -121,13 +127,13 @@ void Renderer::drawTetrisOccupiedCells(const TetrisGame &game)
 
 void Renderer::drawTetrisActiveTetromino(const TetrisGame &game)
 {
-  TetrisBoard tetrisBoard = game.getBoard();
-  Vector2 tetrisPosition = tetrisBoard.getPosition();
+  const TetrisBoard &tetrisBoard = game.getBoard();
+  const Vector2 &tetrisPosition = tetrisBoard.getPosition();
   int tetrisCellSize = tetrisBoard.getCellSize();
 
-  Tetromino activeTetromino = game.getActiveTetromino();
+  const Tetromino &activeTetromino = game.getActiveTetromino();
 
-  std::vector<BoardCell> activeTetrominoCells = activeTetromino.getCells();
+  const std::vector<BoardCell> &activeTetrominoCells = activeTetromino.getCells();
   const ShapeModel *model = activeTetromino.getModel();
   Vec2i position = activeTetromino.getPosition();
 
@@ -135,7 +141,7 @@ void Renderer::drawTetrisActiveTetromino(const TetrisGame &game)
   {
     DrawRectangle(tetrisPosition.x + position.x * tetrisCellSize, tetrisPosition.y + position.y * tetrisCellSize, tetrisCellSize * model->getSize(), tetrisCellSize * model->getSize(), PURPLE);
   }
-  for (BoardCell &cell : activeTetrominoCells)
+  for (const BoardCell &cell : activeTetrominoCells)
   {
     DrawRectangle(tetrisPosition.x + cell.x * tetrisCellSize, tetrisPosition.y + cell.y * tetrisCellSize, tetrisCellSize, tetrisCellSize, cell.color);
   }
@@ -143,17 +149,15 @@ void Renderer::drawTetrisActiveTetromino(const TetrisGame &game)
 
 void Renderer::drawTetrisShadowTetromino(const TetrisGame &game)
 {
-  TetrisBoard tetrisBoard = game.getBoard();
-  Vector2 tetrisPosition = tetrisBoard.getPosition();
+  const TetrisBoard &tetrisBoard = game.getBoard();
+  const Vector2 &tetrisPosition = tetrisBoard.getPosition();
   int tetrisCellSize = tetrisBoard.getCellSize();
 
-  Tetromino shadowTetromino = game.getShadowTetromino();
+  const Tetromino &shadowTetromino = game.getShadowTetromino();
 
-  std::vector<BoardCell> shadowTetrominoCells = shadowTetromino.getCells();
-  const ShapeModel *model = shadowTetromino.getModel();
-  Vec2i position = shadowTetromino.getPosition();
+  const std::vector<BoardCell> &shadowTetrominoCells = shadowTetromino.getCells();
 
-  for (BoardCell &cell : shadowTetrominoCells)
+  for (const BoardCell &cell : shadowTetrominoCells)
   {
     DrawRectangle(tetrisPosition.x + cell.x * tetrisCellSize, tetrisPosition.y + cell.y * tetrisCellSize, tetrisCellSize, tetrisCellSize, MAGENTA);
   }
@@ -161,8 +165,8 @@ void Renderer::drawTetrisShadowTetromino(const TetrisGame &game)
 
 void Renderer::drawNextTetrominoBoard(const TetrisGame &game)
 {
-  NextTetrominoBoard nextTetrominoBoard = game.getNextTetrominoBoard();
-  Vector2 position = nextTetrominoBoard.getPosition();
+  const NextTetrominoBoard &nextTetrominoBoard = game.getNextTetrominoBoard();
+  const Vector2 &position = nextTetrominoBoard.getPosition();
   int width = nextTetrominoBoard.getWidth();
   int height = nextTetrominoBoard.getHeight();
   int borderWidth = 6;
@@ -174,18 +178,18 @@ void Renderer::drawNextTetrominoBoard(const TetrisGame &game)
   float textPadding = (width - textWidth) / 2;
   DrawText("Next", position.x + textPadding, position.y + 5, fontSize, DARKGRAY);
 
-  std::array<Tetromino, 3> nextTetrominos = game.getNextTetrominos();
+  const std::array<Tetromino, 3> &nextTetrominos = game.getNextTetrominos();
 
   int cellSize = nextTetrominoBoard.getCellSize();
   int tetrominoY = position.y + 30;
 
   for (int i = 0; i < nextTetrominos.size(); i++)
   {
-    std::vector<BoardCell> tetrominoCells = nextTetrominos[i].getCells();
+    const std::vector<BoardCell> &tetrominoCells = nextTetrominos[i].getCells();
     int modelSize = nextTetrominos[i].getModel()->getSize();
     int modelWidth = cellSize * modelSize;
     float startX = position.x + (width - modelWidth) / 2;
-    for (BoardCell &cell : tetrominoCells)
+    for (const BoardCell &cell : tetrominoCells)
     {
       DrawRectangle(startX + cell.x * cellSize, tetrominoY + cell.y * cellSize, cellSize, cellSize, cell.color);
     }

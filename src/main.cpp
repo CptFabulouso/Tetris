@@ -1,7 +1,5 @@
 #include "raylib.h"
-#include <iostream>
-#include <algorithm>
-#include <vector>
+#include <ctime>
 
 #include "Player.h"
 #include "TetrisBoard.h"
@@ -12,9 +10,6 @@
 #include "imgui.h"
 #include "imguiThemes.h"
 #include "rlImGui.h"
-
-const int ROWS = 20;
-const int COLUMNS = 10;
 
 int main()
 {
@@ -27,25 +22,27 @@ int main()
 	SetWindowMinSize(400, 200);
 
 	srand(time(0));
-
-	Renderer renderer;
-	TetrisGame tetrisGame{};
-	Player player;
-
-	while (!WindowShouldClose() && tetrisGame.getIsGameOver() == false)
 	{
-		BeginDrawing();
-		ClearBackground(SKYBLUE);
+		// Game scope
+		Renderer renderer;
+		TetrisGame tetrisGame{};
+		Player player;
 
-		float dt = GetFrameTime();
-		Action action = player.getAction(dt);
-		tetrisGame.applyAction(action);
-		tetrisGame.update(dt);
+		while (!WindowShouldClose() && tetrisGame.getIsGameOver() == false)
+		{
+			BeginDrawing();
+			ClearBackground(SKYBLUE);
 
-		renderer.render(tetrisGame);
-		renderer.renderImGUI();
+			float dt = GetFrameTime();
+			Action action = player.getAction(dt);
+			tetrisGame.applyAction(action);
+			tetrisGame.update(dt);
 
-		EndDrawing();
+			renderer.render(tetrisGame);
+			renderer.renderImGUI();
+
+			EndDrawing();
+		}
 	}
 
 	CloseWindow();

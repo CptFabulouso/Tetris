@@ -6,11 +6,14 @@
 class Renderer
 {
 private:
-  ImGuiIO *m_ImGUIio;
   bool m_drawShapeRect = false;
 
 public:
   Renderer();
+  ~Renderer();
+  Renderer(const Renderer &) = delete;
+  Renderer &operator=(const Renderer &) = delete;
+
   void render(const TetrisGame &game);
   void renderImGUI();
 

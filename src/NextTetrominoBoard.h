@@ -21,17 +21,17 @@ public:
     return m_position;
   }
 
-  inline const int getHeight() const
+  int getHeight() const
   {
     return m_height;
   }
 
-  inline const int getWidth() const
+  int getWidth() const
   {
     return m_width;
   }
 
-  inline const int getCellSize() const
+  int getCellSize() const
   {
     return m_cellSize;
   }

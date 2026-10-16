@@ -1,38 +1,9 @@
 #pragma once
 
 #include "raylib.h"
-#include <vector>
 #include "models.h"
 #include "ShapeModel.h"
-
-struct BoardCell
-{
-  Color color = {0, 0, 0, 255};
-  int x = 0;
-  int y = 0;
-};
-
-namespace Rotations
-{
-  constexpr Mat2 deg0 = {{
-      {1, 0},
-      {0, 1},
-  }};
-  constexpr Mat2 deg90 = {{
-      {0, -1},
-      {1, 0},
-  }};
-
-  constexpr Mat2 deg180 = {{
-      {-1, 0},
-      {0, -1},
-  }};
-
-  constexpr Mat2 deg270 = {{
-      {0, 1},
-      {-1, 0},
-  }};
-}
+#include "BoardCell.h"
 
 class Tetromino
 {
@@ -43,13 +14,14 @@ private:
   Rotation m_rotation = DEG0;
 
 public:
-  Tetromino(const ShapeModel *model);
-  Tetromino(const ShapeModel *model, Color color);
+  explicit Tetromino(const ShapeModel &model);
+  Tetromino(const ShapeModel &model, Color color);
+  explicit Tetromino(const ShapeModel &&model) = delete;
 
-  const std::vector<BoardCell> &getCells();
+  const std::vector<BoardCell> &getCells() const;
   const ShapeModel *getModel() const;
-  const Vec2i &getPosition() const;
-  const Rotation getRotation() const;
+  Vec2i getPosition() const;
+  Rotation getRotation() const;
   void move(Vec2i direction);
   void rotate(int direction);
   void setPosition(Vec2i position);
@@ -58,16 +30,16 @@ public:
 
 private:
   void calculateShapeCellsPosition();
-  const Mat2 getRotationMatrix() const;
+  Mat2 getRotationMatrix() const;
 };
 
 namespace TetrominoModels
 {
-  const ShapeModel JShape({{0, 0}, {0, 1}, {1, 1}, {2, 1}});
-  const ShapeModel LShape({{0, 1}, {1, 1}, {2, 1}, {2, 0}});
-  const ShapeModel IShape({{0, 1}, {1, 1}, {2, 1}, {3, 1}});
-  const ShapeModel OShape({{0, 0}, {1, 0}, {0, 1}, {1, 1}});
-  const ShapeModel SShape({{0, 1}, {1, 1}, {1, 0}, {2, 0}});
-  const ShapeModel TShape({{0, 1}, {1, 1}, {1, 0}, {2, 1}});
-  const ShapeModel ZShape({{0, 0}, {1, 0}, {1, 1}, {2, 1}});
+  extern const ShapeModel JShape;
+  extern const ShapeModel LShape;
+  extern const ShapeModel IShape;
+  extern const ShapeModel OShape;
+  extern const ShapeModel SShape;
+  extern const ShapeModel TShape;
+  extern const ShapeModel ZShape;
 }

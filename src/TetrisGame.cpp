@@ -2,13 +2,14 @@
 #include "raylib.h"
 
 TetrisGame::TetrisGame(const Tetromino &tetromino) : m_board{0, 0},
-                                                     m_activeTetromino(tetromino),
-                                                     m_shadowTetromino(tetromino),
                                                      m_nextTetrominos{
                                                          getRandomTetromino(),
                                                          getRandomTetromino(),
                                                          getRandomTetromino(),
-                                                     }
+                                                     },
+                                                     m_activeTetromino(tetromino),
+                                                     m_shadowTetromino(tetromino)
+
 {
 }
 
@@ -31,7 +32,7 @@ void TetrisGame::update(float dt)
   if (m_timer < 0)
   {
     m_timer = m_moveDuration;
-    // m_activeTetromino.move({0, 1});
+    applyAction(Action::MOVE_DOWN);
     if (!m_board.canPlace(m_activeTetromino))
     {
       m_activeTetromino.move({0, -1});
@@ -73,12 +74,12 @@ void TetrisGame::applyAction(Action action)
 
 bool TetrisGame::tryMove(Vec2i direction)
 {
-  Tetromino canditate = m_activeTetromino;
+  Tetromino candidate = m_activeTetromino;
 
-  canditate.move(direction);
-  if (m_board.canPlace(canditate))
+  candidate.move(direction);
+  if (m_board.canPlace(candidate))
   {
-    m_activeTetromino.setPosition(canditate.getPosition());
+    m_activeTetromino.setPosition(candidate.getPosition());
     return true;
   }
   return false;
@@ -86,38 +87,38 @@ bool TetrisGame::tryMove(Vec2i direction)
 
 void TetrisGame::tryRotate(int direction)
 {
-  Tetromino canditate = m_activeTetromino;
-  canditate.rotate(direction);
+  Tetromino candidate = m_activeTetromino;
+  candidate.rotate(direction);
 
-  if (m_board.canPlace(canditate))
+  if (m_board.canPlace(candidate))
   {
-    m_activeTetromino.setRotation(canditate.getRotation());
-    m_activeTetromino.setPosition(canditate.getPosition());
+    m_activeTetromino.setRotation(candidate.getRotation());
+    m_activeTetromino.setPosition(candidate.getPosition());
     return;
   }
 
   /* try wall kick to the right */
   for (int kick = 0; kick <= 2; kick++)
   {
-    canditate.move({1, 0});
-    if (m_board.canPlace(canditate))
+    candidate.move({1, 0});
+    if (m_board.canPlace(candidate))
     {
-      m_activeTetromino.setRotation(canditate.getRotation());
-      m_activeTetromino.setPosition(canditate.getPosition());
+      m_activeTetromino.setRotation(candidate.getRotation());
+      m_activeTetromino.setPosition(candidate.getPosition());
       return;
     }
   }
 
   /*  try wall kick to the left */
   // reset position
-  canditate.setPosition(m_activeTetromino.getPosition());
+  candidate.setPosition(m_activeTetromino.getPosition());
   for (int kick = 0; kick <= 2; kick++)
   {
-    canditate.move({-1, 0});
-    if (m_board.canPlace(canditate))
+    candidate.move({-1, 0});
+    if (m_board.canPlace(candidate))
     {
-      m_activeTetromino.setRotation(canditate.getRotation());
-      m_activeTetromino.setPosition(canditate.getPosition());
+      m_activeTetromino.setRotation(candidate.getRotation());
+      m_activeTetromino.setPosition(candidate.getPosition());
       return;
     }
   }
@@ -136,20 +137,28 @@ void TetrisGame::calculateShadowTetromino()
   m_shadowTetromino.move({0, -1});
 }
 
-void TetrisGame::placeTetromino(Tetromino &tetromino)
+void TetrisGame::placeTetromino(const Tetromino &tetromino)
 {
-  m_board.addOccupiedCells(tetromino.getCells());
-  spawnTetromino();
 
+  m_board.addOccupiedCells(tetromino.getCells());
   int collapsedRows = m_board.collapseFullRows();
+
+  spawnTetromino();
 }
 
 void TetrisGame::spawnTetromino()
 {
+  m_timer = m_moveDuration;
   Tetromino nextTetromino = m_nextTetrominos[0];
 
-  m_activeTetromino = m_nextTetrominos[0];
-  m_shadowTetromino = m_nextTetrominos[0];
+  m_activeTetromino = nextTetromino;
+  while (!m_board.canPlace(m_activeTetromino))
+  {
+    // TODO:
+    tryMove({0, -1});
+  }
+
+  m_shadowTetromino = nextTetromino;
 
   for (int i = 0; i < m_nextTetrominos.size() - 1; i++)
   {
@@ -158,27 +167,26 @@ void TetrisGame::spawnTetromino()
   m_nextTetrominos[m_nextTetrominos.size() - 1] = getRandomTetromino();
 }
 
-const Tetromino TetrisGame::getRandomTetromino()
+Tetromino TetrisGame::getRandomTetromino()
 {
-  int random = rand() % 8;
+  int random = rand() % 7;
 
   switch (random)
   {
+  case 0:
+    return Tetromino{TetrominoModels::JShape, GREEN};
   case 1:
-    return {&TetrominoModels::JShape, GREEN};
+    return Tetromino{TetrominoModels::LShape, BLUE};
   case 2:
-    return {&TetrominoModels::LShape, BLUE};
+    return Tetromino{TetrominoModels::IShape, PURPLE};
   case 3:
-    return {&TetrominoModels::IShape, PURPLE};
+    return Tetromino{TetrominoModels::OShape, LIME};
   case 4:
-    return {&TetrominoModels::OShape, LIME};
+    return Tetromino{TetrominoModels::SShape, MAROON};
   case 5:
-    return {&TetrominoModels::SShape, MAROON};
+    return Tetromino{TetrominoModels::TShape, RED};
   case 6:
-    return {&TetrominoModels::TShape, RED};
-  case 7:
   default:
-    return {&TetrominoModels::ZShape, YELLOW};
-    break;
+    return Tetromino{TetrominoModels::ZShape, YELLOW};
   }
 }

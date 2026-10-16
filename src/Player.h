@@ -1,19 +1,16 @@
 #pragma once
 
-#include <iostream>
-#include <vector>
 #include "models.h"
-#include "ShapeModel.h"
 
 class Player
 {
 private:
-  static constexpr float ACTION_TIMEOUT = 0.1;
-  Action m_lastAction;
+  static constexpr float ACTION_TIMEOUT = 0.1f;
+  Action m_lastAction = Action::NONE;
   float m_actionTimeout = ACTION_TIMEOUT;
 
 public:
-  Player() {}
+  Player() = default;
 
   Action getAction(float dt);
 
