@@ -28,14 +28,17 @@ int main()
 		TetrisGame tetrisGame{};
 		Player player;
 
-		while (!WindowShouldClose() && tetrisGame.getIsGameOver() == false)
+		while (!WindowShouldClose())
 		{
 			BeginDrawing();
 			ClearBackground(SKYBLUE);
 
 			float dt = GetFrameTime();
-			Action action = player.getAction(dt);
-			tetrisGame.applyAction(action);
+			if (!tetrisGame.getIsGameOver())
+			{
+				Action action = player.getAction(dt);
+				tetrisGame.applyAction(action);
+			}
 			tetrisGame.update(dt);
 
 			renderer.render(tetrisGame);

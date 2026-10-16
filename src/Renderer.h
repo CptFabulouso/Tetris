@@ -24,4 +24,5 @@ private:
   void drawTetrisActiveTetromino(const TetrisGame &game);
   void drawTetrisShadowTetromino(const TetrisGame &game);
   void drawNextTetrominoBoard(const TetrisGame &game);
+  void drawGameOver(const TetrisGame &game);
 };

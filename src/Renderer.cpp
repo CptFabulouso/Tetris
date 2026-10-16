@@ -27,10 +27,18 @@ void Renderer::render(const TetrisGame &game)
 {
   drawTetrisBoardBackground(game);
   drawTetrisOccupiedCells(game);
-  drawTetrisShadowTetromino(game);
-  drawTetrisActiveTetromino(game);
+  if (!game.getIsGameOver())
+  {
+    drawTetrisShadowTetromino(game);
+    drawTetrisActiveTetromino(game);
+  }
   drawTetrisBoardGrid(game);
   drawNextTetrominoBoard(game);
+
+  if (game.getIsGameOver())
+  {
+    drawGameOver(game);
+  }
 }
 
 Renderer::~Renderer()
@@ -195,4 +203,27 @@ void Renderer::drawNextTetrominoBoard(const TetrisGame &game)
     }
     tetrominoY += cellSize * modelSize + 10;
   }
+}
+
+void Renderer::drawGameOver(const TetrisGame &game)
+{
+  const TetrisBoard &tetrisBoard = game.getBoard();
+
+  const Vector2 &position = tetrisBoard.getPosition();
+  int cellSize = tetrisBoard.getCellSize();
+  int width = tetrisBoard.getWidth();
+  int height = tetrisBoard.getHeight();
+  int textSize = 30;
+  int textWidth = MeasureText("Game Over", textSize);
+  int textPadding = 10;
+
+  int textBoxHeight = textSize + textPadding * 2;
+  int textBoxWidth = textWidth + textPadding * 2;
+  int paddingHorizontal = (width - textBoxWidth) / 2;
+  int paddingVertical = (height - textBoxHeight) / 2;
+  int textBoxX = position.x + paddingHorizontal;
+  int textBoxY = position.y + paddingVertical;
+
+  DrawRectangle(textBoxX, textBoxY, textBoxWidth, textBoxHeight, BLACK);
+  DrawText("Game over", textBoxX + textPadding, textBoxY + textPadding, textSize, WHITE);
 }

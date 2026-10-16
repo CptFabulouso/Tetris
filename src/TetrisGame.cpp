@@ -28,16 +28,15 @@ void TetrisGame::update(float dt)
   m_nextTetrominoBoard.setPosition({boardPosition.x + boardWidth + 20, boardPosition.y});
   m_nextTetrominoBoard.calculateSize(screenWidth, screenHeight);
 
+  if (m_gameOver)
+  {
+    return;
+  }
   m_timer -= dt;
   if (m_timer < 0)
   {
     m_timer = m_moveDuration;
     applyAction(Action::MOVE_DOWN);
-    if (!m_board.canPlace(m_activeTetromino))
-    {
-      m_activeTetromino.move({0, -1});
-      placeTetromino(m_activeTetromino);
-    }
   }
 
   calculateShadowTetromino();
@@ -152,10 +151,14 @@ void TetrisGame::spawnTetromino()
   Tetromino nextTetromino = m_nextTetrominos[0];
 
   m_activeTetromino = nextTetromino;
-  while (!m_board.canPlace(m_activeTetromino))
+  if (!m_board.canPlace(m_activeTetromino))
   {
-    // TODO:
-    tryMove({0, -1});
+    // TODO: Not correct, uset should still be able to rotate
+    while (!tryMove({0, -1}))
+    {
+      m_gameOver = true;
+      return;
+    };
   }
 
   m_shadowTetromino = nextTetromino;
