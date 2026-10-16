@@ -15,7 +15,7 @@ public:
   Renderer &operator=(const Renderer &) = delete;
 
   void render(const TetrisGame &game);
-  void renderImGUI();
+  void renderImGUI(TetrisGame &game);
 
 private:
   void drawTetrisBoardBackground(const TetrisGame &game);

@@ -23,6 +23,10 @@ void TetrisBoard::addOccupiedCells(const std::vector<BoardCell> &cells)
 {
   for (const BoardCell &cell : cells)
   {
+    if (cell.x < 0 || cell.x > COLUMNS - 1 || cell.y > ROWS - 1 || cell.y < 0)
+    {
+      continue;
+    }
     m_grid[cell.x][cell.y] = cell;
   }
 }
@@ -33,11 +37,14 @@ bool TetrisBoard::canPlace(const Tetromino &tetromino) const
 
   for (const BoardCell &tetrominoCell : tetrominoCells)
   {
-    if (tetrominoCell.x < 0 || tetrominoCell.x > COLUMNS - 1 || tetrominoCell.y > ROWS - 1 || tetrominoCell.y < 0)
+    if (tetrominoCell.y < 0)
+    {
+      continue;
+    }
+    if (tetrominoCell.x < 0 || tetrominoCell.x > COLUMNS - 1 || tetrominoCell.y > ROWS - 1)
     {
       return false;
     }
-
     if (m_grid[tetrominoCell.x][tetrominoCell.y].has_value())
     {
       return false;

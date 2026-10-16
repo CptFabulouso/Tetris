@@ -4,7 +4,6 @@
 
 Renderer::Renderer()
 {
-#pragma region imgui
   rlImGuiSetup(true);
 
   // you can use whatever imgui theme you like!
@@ -20,7 +19,6 @@ Renderer::Renderer()
   {
     style.Colors[ImGuiCol_WindowBg].w = 0.5f;
   }
-#pragma endregion
 }
 
 void Renderer::render(const TetrisGame &game)
@@ -30,8 +28,8 @@ void Renderer::render(const TetrisGame &game)
   if (!game.getIsGameOver())
   {
     drawTetrisShadowTetromino(game);
-    drawTetrisActiveTetromino(game);
   }
+  drawTetrisActiveTetromino(game);
   drawTetrisBoardGrid(game);
   drawNextTetrominoBoard(game);
 
@@ -46,26 +44,31 @@ Renderer::~Renderer()
   rlImGuiShutdown();
 }
 
-void Renderer::renderImGUI()
+void Renderer::renderImGUI(TetrisGame &game)
 {
-#pragma region imgui
   rlImGuiBegin();
 
   ImGui::PushStyleColor(ImGuiCol_WindowBg, {});
   ImGui::PushStyleColor(ImGuiCol_DockingEmptyBg, {});
   ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
   ImGui::PopStyleColor(2);
-#pragma endregion
 
   ImGui::Begin("Dev");
 
   ImGui::Checkbox("Show shape rect", &m_drawShapeRect);
 
+  if (game.getIsGameOver())
+  {
+    if (ImGui::Button("Reset"))
+    {
+      game.resetGame();
+    }
+  }
+
   float framerate = ImGui::GetIO().Framerate;
   ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / framerate, framerate);
   ImGui::End();
 
-#pragma region imgui
   rlImGuiEnd();
 
   if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -73,7 +76,6 @@ void Renderer::renderImGUI()
     ImGui::UpdatePlatformWindows();
     ImGui::RenderPlatformWindowsDefault();
   }
-#pragma endregion
 }
 
 void Renderer::drawTetrisBoardBackground(const TetrisGame &game)
@@ -167,7 +169,7 @@ void Renderer::drawTetrisShadowTetromino(const TetrisGame &game)
 
   for (const BoardCell &cell : shadowTetrominoCells)
   {
-    DrawRectangle(tetrisPosition.x + cell.x * tetrisCellSize, tetrisPosition.y + cell.y * tetrisCellSize, tetrisCellSize, tetrisCellSize, MAGENTA);
+    DrawRectangle(tetrisPosition.x + cell.x * tetrisCellSize, tetrisPosition.y + cell.y * tetrisCellSize, tetrisCellSize, tetrisCellSize, GRAY);
   }
 }
 
@@ -207,6 +209,7 @@ void Renderer::drawNextTetrominoBoard(const TetrisGame &game)
 
 void Renderer::drawGameOver(const TetrisGame &game)
 {
+
   const TetrisBoard &tetrisBoard = game.getBoard();
 
   const Vector2 &position = tetrisBoard.getPosition();

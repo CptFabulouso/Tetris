@@ -71,6 +71,11 @@ void TetrisGame::applyAction(Action action)
   }
 }
 
+void TetrisGame::resetGame()
+{
+  *this = {};
+}
+
 bool TetrisGame::tryMove(Vec2i direction)
 {
   Tetromino candidate = m_activeTetromino;
@@ -138,6 +143,14 @@ void TetrisGame::calculateShadowTetromino()
 
 void TetrisGame::placeTetromino(const Tetromino &tetromino)
 {
+  for (auto &cell : tetromino.getCells())
+  {
+    if (cell.y < 0)
+    {
+      m_gameOver = true;
+      return;
+    }
+  }
 
   m_board.addOccupiedCells(tetromino.getCells());
   int collapsedRows = m_board.collapseFullRows();
@@ -151,14 +164,32 @@ void TetrisGame::spawnTetromino()
   Tetromino nextTetromino = m_nextTetrominos[0];
 
   m_activeTetromino = nextTetromino;
-  if (!m_board.canPlace(m_activeTetromino))
+
+  bool checkGameOver = false;
+  // make sure tetromino can be placed at the spawn location, otherwise try to move it up
+  while (!m_board.canPlace(m_activeTetromino))
   {
-    // TODO: Not correct, uset should still be able to rotate
-    while (!tryMove({0, -1}))
+    checkGameOver = true;
+    m_activeTetromino.move({0, -1});
+  }
+
+  if (checkGameOver)
+  {
+    bool isGameOver = true;
+    // if there is no cell of the tetromino on the play board, it's game over
+    for (auto &cell : m_activeTetromino.getCells())
     {
-      m_gameOver = true;
-      return;
-    };
+      if (cell.y >= 0)
+      {
+        isGameOver = false;
+        break;
+      }
+    }
+    m_gameOver = isGameOver;
+  }
+  if (m_gameOver)
+  {
+    return;
   }
 
   m_shadowTetromino = nextTetromino;

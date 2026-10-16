@@ -42,7 +42,7 @@ int main()
 			tetrisGame.update(dt);
 
 			renderer.render(tetrisGame);
-			renderer.renderImGUI();
+			renderer.renderImGUI(tetrisGame);
 
 			EndDrawing();
 		}

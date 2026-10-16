@@ -24,6 +24,7 @@ public:
   void update(float dt);
 
   void applyAction(Action action);
+  void resetGame();
 
   const TetrisBoard &getBoard() const
   {
