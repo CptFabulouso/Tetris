@@ -11,25 +11,7 @@ private:
   int m_size = 0;
 
 public:
-  explicit ShapeModel(const std::vector<Vec2i> &cells) : m_cells(cells)
-  {
-    int width = 0;
-    int height = 0;
-
-    for (Vec2i &cell : m_cells)
-    {
-      width = std::max(cell.x + 1, width);
-      height = std::max(cell.y + 1, height);
-    }
-
-    m_size = std::max(width, height);
-
-    for (Vec2i &cell : m_cells)
-    {
-      cell.x -= m_size / 2;
-      cell.y -= m_size / 2;
-    }
-  }
+  explicit ShapeModel(const std::vector<Vec2i> &cells);
 
   const std::vector<Vec2i> &getCells() const
   {
@@ -39,23 +21,5 @@ public:
   int getSize() const
   {
     return m_size;
-  }
-
-  Mat3 getRotationMatrix(Rotation rotation) const
-  {
-    float move = m_size % 2 == 0 ? -1 : 0;
-    if (rotation == DEG0)
-    {
-      return Mat3{{{1, 0, 0}, {0, 1, 0}, {0, 0, 0}}};
-    }
-    else if (rotation == DEG90)
-    {
-      return Mat3{{{0, -1, move}, {1, 0, 0}, {0, 0, 0}}};
-    }
-    else if (rotation == DEG180)
-    {
-      return Mat3{{{-1, 0, move}, {0, -1, move}, {0, 0, 0}}};
-    }
-    return Mat3{{{0, 1, 0}, {-1, 0, move}, {0, 0, 0}}};
   }
 };

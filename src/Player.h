@@ -6,7 +6,7 @@ class Player
 {
 private:
   static constexpr float ACTION_TIMEOUT = 0.1f;
-  Action m_lastAction = Action::NONE;
+  Action m_lastAction = Action::None;
   float m_actionTimeout = ACTION_TIMEOUT;
 
 public:

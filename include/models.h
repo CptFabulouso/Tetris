@@ -6,30 +6,20 @@ struct Vec2i
   int y = 0;
 };
 
-struct Mat2
+enum class Rotation
 {
-  float m[2][2];
+  Deg0,
+  Deg90,
+  Deg180,
+  Deg270,
 };
 
-struct Mat3
+enum class Action
 {
-  float m[3][3];
-};
-
-enum Rotation
-{
-  DEG0,
-  DEG90,
-  DEG180,
-  DEG270,
-};
-
-enum Action
-{
-  NONE,
-  MOVE_LEFT,
-  MOVE_RIGHT,
-  MOVE_DOWN,
-  INSTANT_DOWN,
-  ROTATE
+  None,
+  MoveLeft,
+  MoveRight,
+  MoveDown,
+  InstantDown,
+  Rotate
 };

@@ -20,30 +20,30 @@ Action Player::getAction(float dt)
     return nextAction;
   }
 
-  return Action::NONE;
+  return Action::None;
 }
 
 Action Player::getNextAction(float dt)
 {
   if (IsKeyDown(KEY_LEFT))
   {
-    return Action::MOVE_LEFT;
+    return Action::MoveLeft;
   }
   else if (IsKeyDown(KEY_RIGHT))
   {
-    return Action::MOVE_RIGHT;
+    return Action::MoveRight;
   }
   else if (IsKeyDown(KEY_DOWN))
   {
-    return Action::MOVE_DOWN;
+    return Action::MoveDown;
   }
   else if (IsKeyPressed(KEY_UP))
   {
-    return Action::ROTATE;
+    return Action::Rotate;
   }
   else if (IsKeyPressed(KEY_SPACE))
   {
-    return Action::INSTANT_DOWN;
+    return Action::InstantDown;
   }
-  return Action::NONE;
+  return Action::None;
 }

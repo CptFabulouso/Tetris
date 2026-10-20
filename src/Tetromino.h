@@ -11,7 +11,7 @@ private:
   const ShapeModel *m_shapeModel;
   std::vector<BoardCell> m_shapeCells;
   Vec2i m_position{0, 0};
-  Rotation m_rotation = DEG0;
+  Rotation m_rotation = Rotation::Deg0;
 
 public:
   explicit Tetromino(const ShapeModel &model);
@@ -30,7 +30,6 @@ public:
 
 private:
   void calculateShapeCellsPosition();
-  Mat2 getRotationMatrix() const;
 };
 
 namespace TetrominoModels

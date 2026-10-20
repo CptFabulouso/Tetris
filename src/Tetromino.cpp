@@ -1,5 +1,25 @@
 #include "Tetromino.h"
 
+namespace
+{
+  Vec2i rotateInBox(Vec2i currentCell, Rotation rotation, int modelSize)
+  {
+    const int m = modelSize - 1;
+    switch (rotation)
+    {
+    case Rotation::Deg0:
+      return {currentCell.x, currentCell.y};
+    case Rotation::Deg90:
+      return {m - currentCell.y, currentCell.x};
+    case Rotation::Deg180:
+      return {m - currentCell.x, m - currentCell.y};
+    case Rotation::Deg270:
+      return {currentCell.y, m - currentCell.x};
+    }
+    return currentCell;
+  }
+}
+
 Tetromino::Tetromino(const ShapeModel &model) : m_shapeModel(&model)
 {
   m_shapeCells.resize(model.getCells().size());
@@ -14,53 +34,17 @@ Tetromino::Tetromino(const ShapeModel &model, Color color) : Tetromino(model)
 void Tetromino::calculateShapeCellsPosition()
 {
   const std::vector<Vec2i> &modelCells = m_shapeModel->getCells();
-
-  Mat3 rotationMatrix = m_shapeModel->getRotationMatrix(m_rotation);
+  int modelSize = m_shapeModel->getSize();
 
   for (int i = 0; i < modelCells.size(); i++)
   {
-    Vec2i cell = modelCells[i];
-    int x = rotationMatrix.m[0][0] * cell.x + rotationMatrix.m[0][1] * cell.y + rotationMatrix.m[0][2];
-    int y = rotationMatrix.m[1][0] * cell.x + rotationMatrix.m[1][1] * cell.y + rotationMatrix.m[1][2];
-
-    x += m_position.x + m_shapeModel->getSize() / 2;
-    y += m_position.y + m_shapeModel->getSize() / 2;
-
     if (i < m_shapeCells.size())
     {
-      m_shapeCells[i].x = x;
-      m_shapeCells[i].y = y;
+      Vec2i rotatedPosition = rotateInBox(modelCells[i], m_rotation, modelSize);
+      m_shapeCells[i].x = m_position.x + rotatedPosition.x;
+      m_shapeCells[i].y = m_position.y + rotatedPosition.y;
     }
   }
-}
-
-Mat2 Tetromino::getRotationMatrix() const
-{
-  if (m_rotation == DEG0)
-  {
-    return {{
-        {1, 0},
-        {0, 1},
-    }};
-  }
-  if (m_rotation == DEG90)
-  {
-    return {{
-        {0, -1},
-        {1, 0},
-    }};
-  }
-  if (m_rotation == DEG180)
-  {
-    return {{
-        {-1, 0},
-        {0, -1},
-    }};
-  }
-  return {{
-      {0, 1},
-      {-1, 0},
-  }};
 }
 
 const std::vector<BoardCell> &Tetromino::getCells() const
@@ -93,7 +77,7 @@ void Tetromino::move(Vec2i direction)
 void Tetromino::rotate(int direction)
 {
   int r = static_cast<int>(m_rotation);
-  int numOfRotation = static_cast<int>(Rotation::DEG270 + 1);
+  int numOfRotation = static_cast<int>(Rotation::Deg270) + 1;
 
   m_rotation = static_cast<Rotation>(((r + direction) % numOfRotation + 4) % numOfRotation);
   calculateShapeCellsPosition();

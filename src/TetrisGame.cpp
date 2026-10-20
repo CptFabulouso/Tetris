@@ -36,7 +36,7 @@ void TetrisGame::update(float dt)
   if (m_timer < 0)
   {
     m_timer = m_moveDuration;
-    applyAction(Action::MOVE_DOWN);
+    applyAction(Action::MoveDown);
   }
 
   calculateShadowTetromino();
@@ -46,13 +46,13 @@ void TetrisGame::applyAction(Action action)
 {
   switch (action)
   {
-  case MOVE_LEFT:
+  case Action::MoveLeft:
     tryMove({-1, 0});
     break;
-  case MOVE_RIGHT:
+  case Action::MoveRight:
     tryMove({1, 0});
     break;
-  case MOVE_DOWN:
+  case Action::MoveDown:
   {
     if (!tryMove({0, 1}))
     {
@@ -60,10 +60,10 @@ void TetrisGame::applyAction(Action action)
     }
     break;
   }
-  case INSTANT_DOWN:
+  case Action::InstantDown:
     placeTetromino(m_shadowTetromino);
     break;
-  case ROTATE:
+  case Action::Rotate:
     tryRotate(1);
     break;
   default:
