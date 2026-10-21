@@ -6,12 +6,12 @@ struct Vec2i
   int y = 0;
 };
 
-enum class Rotation
+enum class Rotation : unsigned int
 {
-  Deg0,
-  Deg90,
-  Deg180,
-  Deg270,
+  Deg0 = 0,
+  Deg90 = 1,
+  Deg180 = 2,
+  Deg270 = 3,
 };
 
 enum class Action

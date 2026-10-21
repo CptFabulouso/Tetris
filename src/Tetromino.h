@@ -11,21 +11,21 @@ private:
   const ShapeModel *m_shapeModel;
   std::vector<BoardCell> m_shapeCells;
   Vec2i m_position{0, 0};
-  Rotation m_rotation = Rotation::Deg0;
+  size_t m_orientation = 0;
 
 public:
   explicit Tetromino(const ShapeModel &model);
   Tetromino(const ShapeModel &model, Color color);
   explicit Tetromino(const ShapeModel &&model) = delete;
 
-  const std::vector<BoardCell> &getCells() const;
+  const std::vector<BoardCell> &cells() const;
   const ShapeModel *getModel() const;
   Vec2i getPosition() const;
-  Rotation getRotation() const;
+  size_t getOrientation() const;
   void move(Vec2i direction);
   void rotate(int direction);
   void setPosition(Vec2i position);
-  void setRotation(Rotation rotation);
+  void setOrientation(size_t orientation);
   void setColor(Color color);
 
 private:

@@ -1,28 +1,9 @@
 #include "Tetromino.h"
-
-namespace
-{
-  Vec2i rotateInBox(Vec2i currentCell, Rotation rotation, int modelSize)
-  {
-    const int m = modelSize - 1;
-    switch (rotation)
-    {
-    case Rotation::Deg0:
-      return {currentCell.x, currentCell.y};
-    case Rotation::Deg90:
-      return {m - currentCell.y, currentCell.x};
-    case Rotation::Deg180:
-      return {m - currentCell.x, m - currentCell.y};
-    case Rotation::Deg270:
-      return {currentCell.y, m - currentCell.x};
-    }
-    return currentCell;
-  }
-}
+#include "TtrAssert.h"
 
 Tetromino::Tetromino(const ShapeModel &model) : m_shapeModel(&model)
 {
-  m_shapeCells.resize(model.getCells().size());
+  m_shapeCells.resize(model.cells(0).size());
   calculateShapeCellsPosition();
 }
 
@@ -33,21 +14,17 @@ Tetromino::Tetromino(const ShapeModel &model, Color color) : Tetromino(model)
 
 void Tetromino::calculateShapeCellsPosition()
 {
-  const std::vector<Vec2i> &modelCells = m_shapeModel->getCells();
-  int modelSize = m_shapeModel->getSize();
+  const std::vector<Vec2i> &modelCells = m_shapeModel->cells(m_orientation);
 
-  for (int i = 0; i < modelCells.size(); i++)
+  TTR_ASSERT(modelCells.size() == m_shapeCells.size());
+  for (size_t i = 0; i < modelCells.size(); i++)
   {
-    if (i < m_shapeCells.size())
-    {
-      Vec2i rotatedPosition = rotateInBox(modelCells[i], m_rotation, modelSize);
-      m_shapeCells[i].x = m_position.x + rotatedPosition.x;
-      m_shapeCells[i].y = m_position.y + rotatedPosition.y;
-    }
+    m_shapeCells[i].x = m_position.x + modelCells[i].x;
+    m_shapeCells[i].y = m_position.y + modelCells[i].y;
   }
 }
 
-const std::vector<BoardCell> &Tetromino::getCells() const
+const std::vector<BoardCell> &Tetromino::cells() const
 {
   return m_shapeCells;
 }
@@ -62,9 +39,9 @@ Vec2i Tetromino::getPosition() const
   return m_position;
 }
 
-Rotation Tetromino::getRotation() const
+size_t Tetromino::getOrientation() const
 {
-  return m_rotation;
+  return m_orientation;
 }
 
 void Tetromino::move(Vec2i direction)
@@ -76,10 +53,10 @@ void Tetromino::move(Vec2i direction)
 
 void Tetromino::rotate(int direction)
 {
-  int r = static_cast<int>(m_rotation);
-  int numOfRotation = static_cast<int>(Rotation::Deg270) + 1;
+  const int count = static_cast<int>(m_shapeModel->orientationsCount());
 
-  m_rotation = static_cast<Rotation>(((r + direction) % numOfRotation + 4) % numOfRotation);
+  const int next = (static_cast<int>(m_orientation) + direction % count + count) % count;
+  m_orientation = static_cast<size_t>(next);
   calculateShapeCellsPosition();
 }
 
@@ -89,9 +66,10 @@ void Tetromino::setPosition(Vec2i position)
   calculateShapeCellsPosition();
 }
 
-void Tetromino::setRotation(Rotation rotation)
+void Tetromino::setOrientation(size_t orientation)
 {
-  m_rotation = rotation;
+  TTR_ASSERT(orientation < m_shapeModel->orientationsCount());
+  m_orientation = orientation;
   calculateShapeCellsPosition();
 }
 

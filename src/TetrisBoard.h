@@ -31,6 +31,7 @@ public:
   void calculateSize(int screenWidth, int screenHeight);
   void addOccupiedCells(const std::vector<BoardCell> &cells);
   bool canPlace(const Tetromino &tetromino) const;
+  Tetromino dropped(Tetromino tetromino) const;
   int collapseFullRows();
 
   const Vector2 &getPosition() const

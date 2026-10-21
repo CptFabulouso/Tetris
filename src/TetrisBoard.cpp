@@ -33,7 +33,7 @@ void TetrisBoard::addOccupiedCells(const std::vector<BoardCell> &cells)
 
 bool TetrisBoard::canPlace(const Tetromino &tetromino) const
 {
-  const std::vector<BoardCell> &tetrominoCells = tetromino.getCells();
+  const std::vector<BoardCell> &tetrominoCells = tetromino.cells();
 
   for (const BoardCell &tetrominoCell : tetrominoCells)
   {
@@ -51,6 +51,17 @@ bool TetrisBoard::canPlace(const Tetromino &tetromino) const
     }
   }
   return true;
+}
+
+Tetromino TetrisBoard::dropped(Tetromino tetromino) const
+{
+  while (canPlace(tetromino))
+  {
+    tetromino.move({0, 1});
+  }
+  // move one cell up
+  tetromino.move({0, -1});
+  return tetromino;
 }
 
 int TetrisBoard::collapseFullRows()

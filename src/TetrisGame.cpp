@@ -96,8 +96,7 @@ void TetrisGame::tryRotate(int direction)
 
   if (m_board.canPlace(candidate))
   {
-    m_activeTetromino.setRotation(candidate.getRotation());
-    m_activeTetromino.setPosition(candidate.getPosition());
+    m_activeTetromino = candidate;
     return;
   }
 
@@ -107,8 +106,7 @@ void TetrisGame::tryRotate(int direction)
     candidate.move({1, 0});
     if (m_board.canPlace(candidate))
     {
-      m_activeTetromino.setRotation(candidate.getRotation());
-      m_activeTetromino.setPosition(candidate.getPosition());
+      m_activeTetromino = candidate;
       return;
     }
   }
@@ -121,8 +119,7 @@ void TetrisGame::tryRotate(int direction)
     candidate.move({-1, 0});
     if (m_board.canPlace(candidate))
     {
-      m_activeTetromino.setRotation(candidate.getRotation());
-      m_activeTetromino.setPosition(candidate.getPosition());
+      m_activeTetromino = candidate;
       return;
     }
   }
@@ -130,8 +127,7 @@ void TetrisGame::tryRotate(int direction)
 
 void TetrisGame::calculateShadowTetromino()
 {
-  m_shadowTetromino.setPosition(m_activeTetromino.getPosition());
-  m_shadowTetromino.setRotation(m_activeTetromino.getRotation());
+  m_shadowTetromino = m_activeTetromino;
 
   while (m_board.canPlace(m_shadowTetromino))
   {
@@ -143,7 +139,7 @@ void TetrisGame::calculateShadowTetromino()
 
 void TetrisGame::placeTetromino(const Tetromino &tetromino)
 {
-  for (auto &cell : tetromino.getCells())
+  for (auto &cell : tetromino.cells())
   {
     if (cell.y < 0)
     {
@@ -152,7 +148,7 @@ void TetrisGame::placeTetromino(const Tetromino &tetromino)
     }
   }
 
-  m_board.addOccupiedCells(tetromino.getCells());
+  m_board.addOccupiedCells(tetromino.cells());
   int collapsedRows = m_board.collapseFullRows();
 
   spawnTetromino();
@@ -177,7 +173,7 @@ void TetrisGame::spawnTetromino()
   {
     bool isGameOver = true;
     // if there is no cell of the tetromino on the play board, it's game over
-    for (auto &cell : m_activeTetromino.getCells())
+    for (auto &cell : m_activeTetromino.cells())
     {
       if (cell.y >= 0)
       {

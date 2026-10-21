@@ -143,13 +143,13 @@ void Renderer::drawTetrisActiveTetromino(const TetrisGame &game)
 
   const Tetromino &activeTetromino = game.getActiveTetromino();
 
-  const std::vector<BoardCell> &activeTetrominoCells = activeTetromino.getCells();
+  const std::vector<BoardCell> &activeTetrominoCells = activeTetromino.cells();
   const ShapeModel *model = activeTetromino.getModel();
   Vec2i position = activeTetromino.getPosition();
 
   if (m_drawShapeRect)
   {
-    DrawRectangle(tetrisPosition.x + position.x * tetrisCellSize, tetrisPosition.y + position.y * tetrisCellSize, tetrisCellSize * model->getSize(), tetrisCellSize * model->getSize(), PURPLE);
+    DrawRectangle(tetrisPosition.x + position.x * tetrisCellSize, tetrisPosition.y + position.y * tetrisCellSize, tetrisCellSize * model->getBoxSize(), tetrisCellSize * model->getBoxSize(), PURPLE);
   }
   for (const BoardCell &cell : activeTetrominoCells)
   {
@@ -165,7 +165,7 @@ void Renderer::drawTetrisShadowTetromino(const TetrisGame &game)
 
   const Tetromino &shadowTetromino = game.getShadowTetromino();
 
-  const std::vector<BoardCell> &shadowTetrominoCells = shadowTetromino.getCells();
+  const std::vector<BoardCell> &shadowTetrominoCells = shadowTetromino.cells();
 
   for (const BoardCell &cell : shadowTetrominoCells)
   {
@@ -195,8 +195,8 @@ void Renderer::drawNextTetrominoBoard(const TetrisGame &game)
 
   for (int i = 0; i < nextTetrominos.size(); i++)
   {
-    const std::vector<BoardCell> &tetrominoCells = nextTetrominos[i].getCells();
-    int modelSize = nextTetrominos[i].getModel()->getSize();
+    const std::vector<BoardCell> &tetrominoCells = nextTetrominos[i].cells();
+    int modelSize = nextTetrominos[i].getModel()->getBoxSize();
     int modelWidth = cellSize * modelSize;
     float startX = position.x + (width - modelWidth) / 2;
     for (const BoardCell &cell : tetrominoCells)
